@@ -1,13 +1,21 @@
 const router = require("express").Router();
-const passport = require("passport")
+const passport = require("passport");
+const authControllers = require("../controllers/authControllers.js");
+const ensureAuthenticated = require("../middlewares/ensureAuthenticated.js");
 
-router.get("/login", (req, res) => {
-  res.send("Login route");
-});
+const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
 
-router.get("/register", (req, res) => {
-  res.send("Register route");
-}); 
+router.post("/api/auth/register", authControllers.register);
+router.post("/api/auth/login", authControllers.login);
+router.post("/api/auth/logout", authControllers.logout);
+router.get("/api/auth/me", authControllers.getCurrentUser);
+router.post("/api/auth/change-password", ensureAuthenticated, authControllers.changePassword);
+
+router.post(
+  "/api/auth/complete-profile",
+  ensureAuthenticated,
+  authControllers.completeProfile,
+);
 
 router.get("/logout", (req, res) => {
   req.logout((err) => {
@@ -18,12 +26,21 @@ router.get("/logout", (req, res) => {
   });
 });
 
-router.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+router.get(
+  "/auth/google",
+  passport.authenticate("google", { scope: ["profile", "email"] }),
+);
 
-router.get("/auth/google/rentora", passport.authenticate("google", { failureRedirect: "/login" }), (req, res) => {
-  res.redirect("http://localhost:5173/complete-profile");
-}); 
+router.get(
+  "/auth/google/rentora",
+  passport.authenticate("google", { failureRedirect: `${clientUrl}/login` }),
+  (req, res) => {
+    if (req.user.profileComplete) {
+      return res.redirect(`${clientUrl}/dashboard`);
+    }
+    return res.redirect(`${clientUrl}/complete-profile`);
+  },
+);
+
 
 module.exports = router;
-    
-

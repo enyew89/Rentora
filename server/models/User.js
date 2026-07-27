@@ -19,6 +19,11 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       enum: ["landlord", "admin", "renter", "applicant"],
+      default: "landlord",
+    },
+    profileComplete: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true },

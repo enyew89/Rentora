@@ -11,6 +11,7 @@ export default function Login() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const {
     register,
@@ -23,10 +24,12 @@ export default function Login() {
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
+    setErrorMessage("");
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           email: data.email,
           password: data.password,
@@ -34,12 +37,19 @@ export default function Login() {
       });
 
       if (response.ok) {
-        navigate("/dashboard");
+        const result = await response.json();
+        if (result.user?.profileComplete) {
+          navigate("/dashboard");
+        } else {
+          navigate("/complete-profile");
+        }
       } else {
-        console.error("Login failed");
+        const result = await response.json().catch(() => ({}));
+        setErrorMessage(result.message || "Login failed");
       }
     } catch (error) {
       console.error("Error:", error);
+      setErrorMessage("Unable to connect to the server");
     } finally {
       setIsSubmitting(false);
     }
@@ -89,6 +99,9 @@ export default function Login() {
               </div>
 
               {/* Form */}
+              {errorMessage && (
+                <p className="text-sm text-red-400">{errorMessage}</p>
+              )}
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 {/* Email */}
                 <Input
@@ -152,7 +165,7 @@ export default function Login() {
                   variant="secondary"
                   type="button"
                   onClick={() => {
-                    window.location.href = "http://localhost:3000/auth/google";
+                    window.location.href = "/auth/google";
                   }}
                 >
                   <FcGoogle size={18} />
