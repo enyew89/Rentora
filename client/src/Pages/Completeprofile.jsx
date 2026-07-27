@@ -1,61 +1,80 @@
-import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowRight } from 'lucide-react';
-import * as z from 'zod';
-import { Button, Input } from '../components';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowRight } from "lucide-react";
+import * as z from "zod";
+import { Button, Input } from "../components";
 
 const completeProfileSchema = z.object({
-  firstName: z.string()
-    .min(1, 'First name is required')
-    .min(2, 'First name must be at least 2 characters'),
-  
-  lastName: z.string()
-    .min(1, 'Last name is required')
-    .min(2, 'Last name must be at least 2 characters'),
-  
-  phoneNumber: z.string()
-    .min(1, 'Phone number is required')
-    .regex(/^\d{10,}$/, 'Phone number must be at least 10 digits'),
+  firstName: z
+    .string()
+    .min(1, "First name is required")
+    .min(2, "First name must be at least 2 characters"),
+
+  lastName: z
+    .string()
+    .min(1, "Last name is required")
+    .min(2, "Last name must be at least 2 characters"),
+
+  phoneNumber: z
+    .string()
+    .min(1, "Phone number is required")
+    .regex(/^\d{10,}$/, "Phone number must be at least 10 digits"),
 });
 
-export default function CompleteProfile() {
+export default function CompleteProfile({ onProfileComplete }) {  // <-- accepts prop
   const navigate = useNavigate();
-  const location = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     resolver: zodResolver(completeProfileSchema),
-    mode: 'onBlur',
+    mode: "onBlur",
   });
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
-    try {
-      // Get email from session or location state
-      const email = sessionStorage.getItem('registeredEmail') || location.state?.email;
+    setErrorMessage("");
 
-      const response = await fetch('/api/auth/complete-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+    try {
+      const response = await fetch("/api/auth/complete-profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
         body: JSON.stringify({
-          email,
           firstName: data.firstName,
           lastName: data.lastName,
           phoneNumber: data.phoneNumber,
         }),
       });
 
-      if (response.ok) {
-        sessionStorage.removeItem('registeredEmail');
-        // Redirect to verify email or dashboard
-        navigate('/verify-email', { state: { email } });
-      } else {
-        console.error('Profile completion failed');
+      const result = await response.json();
+
+      console.log("Complete profile response:", result);
+
+      if (!response.ok) {
+        setErrorMessage(
+          result.message || "Failed to complete your profile"
+        );
+        return;
       }
+
+      // Update shared auth state in App.jsx BEFORE navigating
+      // so ProtectedRoute already sees profileComplete: true
+      onProfileComplete(result.user);  // <-- added
+
+      navigate("/dashboard", { replace: true });
+
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
+      setErrorMessage("Unable to connect to the server");
     } finally {
       setIsSubmitting(false);
     }
@@ -86,7 +105,7 @@ export default function CompleteProfile() {
         <div className="group relative">
           {/* Glow effect */}
           <div className="absolute inset-0 bg-gradient-to-r from-red-600/20 to-orange-500/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          
+
           {/* Card */}
           <div className="relative bg-gray-900/60 backdrop-blur-2xl border border-gray-800/60 rounded-3xl p-8 shadow-2xl overflow-hidden">
             {/* Subtle inner gradient */}
@@ -99,10 +118,15 @@ export default function CompleteProfile() {
                 <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                   Complete Your Profile
                 </h2>
-                <p className="text-sm text-gray-500">Let's get your Rentora account ready.</p>
+                <p className="text-sm text-gray-500">
+                  Let's get your Rentora account ready.
+                </p>
               </div>
 
               {/* Form */}
+              {errorMessage && (
+                <p className="text-sm text-red-400">{errorMessage}</p>
+              )}
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 {/* Name row */}
                 <div className="grid grid-cols-2 gap-3">
@@ -110,13 +134,13 @@ export default function CompleteProfile() {
                     label="First Name"
                     placeholder="John"
                     error={errors.firstName?.message}
-                    {...register('firstName')}
+                    {...register("firstName")}
                   />
                   <Input
                     label="Last Name"
                     placeholder="Doe"
                     error={errors.lastName?.message}
-                    {...register('lastName')}
+                    {...register("lastName")}
                   />
                 </div>
 
@@ -126,7 +150,7 @@ export default function CompleteProfile() {
                   type="tel"
                   placeholder="+1 (555) 000-0000"
                   error={errors.phoneNumber?.message}
-                  {...register('phoneNumber')}
+                  {...register("phoneNumber")}
                 />
 
                 {/* Submit button */}

@@ -12,6 +12,7 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const { register, handleSubmit, formState: { errors }, watch } = useForm({
     resolver: zodResolver(authSchema),
@@ -23,10 +24,12 @@ export default function Register() {
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
+    setErrorMessage("");
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           email: data.email,
           password: data.password,
@@ -34,21 +37,22 @@ export default function Register() {
       });
 
       if (response.ok) {
-        // Store email for profile completion
-        navigate('/complete-profile');
+        navigate("/complete-profile");
       } else {
-        console.error('Registration failed');
+        const result = await response.json().catch(() => ({}));
+        setErrorMessage(result.message || "Registration failed");
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
+      setErrorMessage("Unable to connect to the server");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleGoogleSignup = () => {
-  window.location.href = "auth/auth/google";
-};
+    window.location.href = "/auth/google";
+  };
 
   return (
     <div className="min-h-screen bg-black text-gray-100 overflow-hidden flex flex-col justify-center items-center px-4">
@@ -108,6 +112,9 @@ export default function Register() {
               </div>
 
               {/* Form */}
+              {errorMessage && (
+                <p className="text-sm text-red-400">{errorMessage}</p>
+              )}
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 {/* Email */}
                 <Input

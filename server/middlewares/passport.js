@@ -14,29 +14,58 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: "http://localhost:3000/auth/google/rentora",
     },
-    async function (accessToken, refreshToken, profile, cb) {
-      User.findOrCreate(
-        { googleId: profile.id },
-        { username: profile.emails[0].value },
-        function (err, user) {
-          if (!err) {
-            sendEmail(profile.emails[0].value);
+    async (accessToken, refreshToken, profile, cb) => {
+      try {
+        const email = profile.emails[0].value;
+
+        let user = await User.findOne({ username: email });
+
+        if (user) {
+          // User already exists
+
+          if (!user.googleId) {
+            user.googleId = profile.id;
+            await user.save();
           }
-          return cb(err, user);
-        },
-      );
-    },
-  ),
+
+          return cb(null, user);
+        }
+
+        // User doesn't exist, create a new one
+        user = await User.create({
+          username: email,
+          googleId: profile.id,
+          role: "landlord",
+        });
+
+        await sendEmail(
+          email,
+          "Welcome to Rentora",
+          "Welcome to Rentora! Your account has been created successfully."
+        );
+
+        return cb(null, user);
+
+      } catch (err) {
+        return cb(err);
+      }
+    }
+  )
 );
-passport.serializeUser((user, cb) => {
-  cb(null, user.id);
+passport.serializeUser((user, done) => {
+  done(null, user._id);
 });
 
-passport.deserializeUser(async (id, cb) => {
+passport.deserializeUser(async (id, done) => {
   try {
     const user = await User.findById(id);
-    cb(null, user);
-  } catch (err) {
-    cb(err);
+
+    if (!user) {
+      return done(null, false);
+    }
+
+    done(null, user);
+  } catch (error) {
+    done(error);
   }
 });
