@@ -1,28 +1,69 @@
-import { GlassCard, EmptyState, PageHeader, PrimaryButton, Badge } from "../../components/ui";
-import { mockProperties } from "../../lib/mockData";
+import { useEffect, useState } from "react";
+import {
+  GlassCard,
+  EmptyState,
+  PageHeader,
+  PrimaryButton,
+  Badge,
+} from "../../components/ui";
+
+const BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+
+async function apiFetch(endpoint) {
+  const response = await fetch(`${BASE_URL}${endpoint}`, {
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Something went wrong");
+  }
+
+  return data;
+}
 
 function PropertyCard({ property, onClick }) {
-  const occupancyPct = Math.round((property.occupiedUnits / property.totalUnits) * 100);
+  // Use the actual values returned from your backend
+  const totalUnits = property.totalUnits || 0;
+  const occupiedUnits = property.occupiedUnits || 0;
+  const vacantUnits = totalUnits - occupiedUnits;
+
+  const occupancyPct =
+    totalUnits > 0
+      ? Math.round((occupiedUnits / totalUnits) * 100)
+      : 0;
 
   return (
-    <GlassCard className="p-5 hover:bg-white/8 transition-colors cursor-pointer group" onClick={onClick}>
+    <GlassCard
+      className="p-5 hover:bg-white/8 transition-colors cursor-pointer group"
+      onClick={onClick}
+    >
       <div className="flex items-start justify-between mb-3">
         <div>
           <h3 className="text-base font-medium text-white group-hover:text-blue-300 transition-colors">
             {property.name}
           </h3>
-          <p className="text-sm text-white/40 mt-0.5">{property.address}</p>
+
+          <p className="text-sm text-white/40 mt-0.5">
+            {property.address || "No address provided"}
+          </p>
         </div>
+
         <span className="text-xs text-white/30 bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">
-          {property.type}
+          {property.type || "Property"}
         </span>
       </div>
 
-      {/* Mini occupancy bar */}
+      {/* Occupancy bar */}
       <div className="mb-3">
         <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
           <div
-            className="h-full bg-blue-500/70 rounded-full"
+            className="h-full bg-blue-500/70 rounded-full transition-all"
             style={{ width: `${occupancyPct}%` }}
           />
         </div>
@@ -30,24 +71,63 @@ function PropertyCard({ property, onClick }) {
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3 text-sm">
-          <span className="text-white/50">{property.totalUnits} units</span>
+          <span className="text-white/50">
+            {totalUnits} units
+          </span>
+
           <span className="text-white/20">·</span>
-          <span className="text-emerald-400">{property.occupiedUnits} occupied</span>
+
+          <span className="text-emerald-400">
+            {occupiedUnits} occupied
+          </span>
+
           <span className="text-white/20">·</span>
-          <span className="text-amber-400">{property.vacantUnits} vacant</span>
+
+          <span className="text-amber-400">
+            {vacantUnits} vacant
+          </span>
         </div>
-        <span className="text-xs text-blue-400 group-hover:translate-x-0.5 transition-transform">View →</span>
+
+        <span className="text-xs text-blue-400 group-hover:translate-x-0.5 transition-transform">
+          View →
+        </span>
       </div>
     </GlassCard>
   );
 }
 
 export default function Properties({ navigate }) {
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    async function fetchProperties() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const data = await apiFetch("/properties");
+
+        console.log("Properties received:", data);
+
+        setProperties(data);
+      } catch (err) {
+        console.error("Failed to fetch properties:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProperties();
+  }, []);
+
   return (
     <div className="space-y-5">
       <PageHeader
         title="My Properties"
-        subtitle={`${mockProperties.length} properties`}
+        subtitle={`${properties.length} properties`}
         action={
           <PrimaryButton onClick={() => navigate("add-property")}>
             + Add property
@@ -55,24 +135,59 @@ export default function Properties({ navigate }) {
         }
       />
 
-      {mockProperties.length === 0 ? (
+      {/* Loading */}
+      {loading && (
+        <GlassCard className="p-8 text-center">
+          <p className="text-sm text-white/40">
+            Loading your properties...
+          </p>
+        </GlassCard>
+      )}
+
+      {/* Error */}
+      {!loading && error && (
+        <GlassCard className="p-8 text-center">
+          <p className="text-sm text-red-400">
+            Failed to load properties: {error}
+          </p>
+
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 text-sm text-blue-400 hover:text-blue-300"
+          >
+            Try again
+          </button>
+        </GlassCard>
+      )}
+
+      {/* Empty state */}
+      {!loading && !error && properties.length === 0 && (
         <EmptyState
           icon="🏢"
           title="No properties yet"
           description="Add your first property to get started."
           action={
-            <PrimaryButton onClick={() => navigate("add-property")}>
+            <PrimaryButton
+              onClick={() => navigate("add-property")}
+            >
               + Add property
             </PrimaryButton>
           }
         />
-      ) : (
+      )}
+
+      {/* Properties */}
+      {!loading && !error && properties.length > 0 && (
         <div className="space-y-3">
-          {mockProperties.map((p) => (
+          {properties.map((property) => (
             <PropertyCard
-              key={p._id}
-              property={p}
-              onClick={() => navigate("property-detail", { propertyId: p._id })}
+              key={property._id}
+              property={property}
+              onClick={() =>
+                navigate("property-detail", {
+                  propertyId: property._id,
+                })
+              }
             />
           ))}
         </div>
