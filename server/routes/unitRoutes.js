@@ -28,7 +28,7 @@ router.get("/all", async (req, res) => {
 });       // GET /units?property=:propertyId
 router.get("/:id", getUnit);
 router.post("/", createUnit);
-router.patch("/:id", updateUnit);
+router.put("/:id", updateUnit);
 router.delete("/:id", deleteUnit);
 
 module.exports = router;

@@ -1,20 +1,24 @@
 const express = require("express");
+const router = express.Router();
 const {
   createInvitation,
   getInvitations,
-  acceptInvitation,
+  getInvitation,
+  registerFromInvitation,
   cancelInvitation,
 } = require("../controllers/invitationControllers.js");
-const { isAuthenticated, isLandlord } = require("../middlewares/auth.js");
 
-const router = express.Router();
+const { isAuthenticated, isLandlord, isRenter} = require("../middlewares/auth.js");
 
-// public — renter opens link from email (no auth needed to view, but auth needed to accept)
-router.get("/accept/:token", acceptInvitation);
+// ── Landlord routes (protected) ───────────────────────────────────────────────
+router.post("/", isAuthenticated, createInvitation);
+router.get("/", isAuthenticated, getInvitations);
+router.delete("/:id", isAuthenticated, cancelInvitation);
 
-// landlord only
-router.post("/", isAuthenticated, isLandlord, createInvitation);
-router.get("/", isAuthenticated, isLandlord, getInvitations);
-router.delete("/:id", isAuthenticated, isLandlord, cancelInvitation);
+// ── Public routes — no login required ─────────────────────────────────────────
+// IMPORTANT: /accept must be defined BEFORE /:token
+// otherwise Express matches "accept" as the token
+router.post("/accept", registerFromInvitation);
+router.get("/:token", getInvitation);
 
 module.exports = router;

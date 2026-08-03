@@ -15,7 +15,7 @@ router.use(isAuthenticated, isLandlord);
 router.get("/", getProperties);
 router.get("/:id", getProperty);
 router.post("/", createProperty);
-router.patch("/:id", updateProperty);
+router.put("/:id", updateProperty);
 router.delete("/:id", deleteProperty);
 
 module.exports = router;

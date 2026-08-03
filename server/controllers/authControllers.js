@@ -1,6 +1,7 @@
 const passport = require("passport");
 const User = require("../models/User.js");
 const sendEmail = require("../config/nodemailer.js");
+const {isAuthenticated, isLandlord, isRenter} = require("../middlewares/auth.js");
 
 function formatUser(user) {
   return {
@@ -167,45 +168,82 @@ exports.changePassword = async function (req, res) {
   const { currentPassword, newPassword } = req.body;
 
   if (!newPassword || newPassword.length < 8) {
-    return res
-      .status(400)
-      .json({ message: "New password must be at least 8 characters" });
+    return res.status(400).json({
+      message: "New password must be at least 8 characters",
+    });
   }
 
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user._id).select("+hash +salt");
 
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    console.log("Has password:", Boolean(user.hash));
+    console.log("Current password provided:", Boolean(currentPassword));
+
+    // User already has a password
     if (user.hash) {
-      // Local user — verify current password first
       if (!currentPassword) {
-        return res
-          .status(400)
-          .json({ message: "Current password is required" });
+        return res.status(400).json({
+          message: "Current password is required",
+        });
       }
 
-      user.authenticate(currentPassword, async function (err, result) {
-        if (err || !result) {
-          return res
-            .status(401)
-            .json({ message: "Current password is incorrect" });
+      user.authenticate(currentPassword, async (err, authenticatedUser) => {
+        if (err) {
+          console.error("AUTHENTICATION ERROR:", err);
+
+          return res.status(500).json({
+            message: "Failed to verify current password",
+          });
         }
 
-        await user.setPassword(newPassword);
-        await user.save();
+        console.log(
+          "Password authentication result:",
+          authenticatedUser ? "CORRECT" : "INCORRECT"
+        );
 
-        return res
-          .status(200)
-          .json({ message: "Password changed successfully" });
+        if (!authenticatedUser) {
+          return res.status(401).json({
+            message: "Current password is incorrect",
+          });
+        }
+
+        try {
+          await user.setPassword(newPassword);
+          await user.save();
+
+          return res.status(200).json({
+            message: "Password changed successfully",
+          });
+        } catch (error) {
+          console.error("PASSWORD UPDATE ERROR:", error);
+
+          return res.status(500).json({
+            message: "Failed to change password",
+          });
+        }
       });
-    } else {
-      // Google OAuth user — no current password needed
-      await user.setPassword(newPassword);
-      await user.save();
 
-      return res.status(200).json({ message: "Password set successfully" });
+      return;
     }
+
+    // User has no password (Google-only account)
+    await user.setPassword(newPassword);
+    await user.save();
+
+    return res.status(200).json({
+      message: "Password set successfully",
+    });
   } catch (err) {
     console.error("CHANGE PASSWORD ERROR:", err);
-    return res.status(500).json({ message: "Failed to change password" });
+
+    return res.status(500).json({
+      message: "Failed to change password",
+    });
   }
 };

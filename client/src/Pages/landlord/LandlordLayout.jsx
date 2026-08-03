@@ -9,6 +9,9 @@ import Renters from "./Renters";
 import Payments from "./Payments";
 import Maintenance from "./Maintenance";
 import Settings from "./Settings";
+import EditUnit from "./EditUnit";
+import EditProperty from "./EditProperty";
+import InviteRenter from "./InviteRenter";  
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
 const NAV = [
@@ -34,6 +37,10 @@ function renderPage(route, navigate) {
       return <AddUnit navigate={navigate} params={route.params} />;
     case "unit-detail":
       return <UnitDetail navigate={navigate} params={route.params} />;
+    case "edit-unit":
+      return <EditUnit navigate={navigate} params={route.params} />;
+    case "invite-renter":
+      return <InviteRenter navigate={navigate} params={route.params} />;
     case "renters":
       return <Renters navigate={navigate} />;
     case "payments":
@@ -42,6 +49,8 @@ function renderPage(route, navigate) {
       return <Maintenance />;
     case "settings":
       return <Settings />;
+    case "edit-property":
+      return <EditProperty navigate={navigate} params={route.params} />;
     default:
       return <Dashboard navigate={navigate} />;
   }
@@ -53,8 +62,11 @@ const ACTIVE_TAB = {
   properties: "properties",
   "add-property": "properties",
   "property-detail": "properties",
+  "edit-property": "properties",
+   "invite-renter": "properties",
   "add-unit": "properties",
   "unit-detail": "properties",
+  "edit-unit": "properties",
   renters: "renters",
   payments: "payments",
   maintenance: "maintenance",

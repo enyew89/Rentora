@@ -10,6 +10,9 @@ import Register from "./Pages/Register";
 
 import LandlordLayout from "./Pages/landlord/LandlordLayout";
 import CompleteProfile from "./Pages/Completeprofile";
+import AcceptInvite from "./Pages/AcceptInvites";
+import RenterLayout from "./Pages/renter/RenterLayout";
+
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -52,6 +55,8 @@ function App() {
 
         <Route path="/register" element={<Register />} />
 
+        <Route path="/accept-invite/:token" element={<AcceptInvite />} />
+
         {/* =========================
             COMPLETE PROFILE
         ========================= */}
@@ -93,19 +98,21 @@ function App() {
 
         {/* You can build this later */}
 
-        {/* 
-        <Route
-          path="/renter-dashboard/*"
-          element={
-            <ProtectedRoute
-              requireCompleteProfile
-              requiredRole="renter"
-            >
-              <RenterLayout />
-            </ProtectedRoute>
-          }
-        />
-        */}
+
+// in your Routes:
+<Route
+  path="/renter/*"
+  element={
+    <ProtectedRoute
+      user={user}
+      authStatus={authStatus}
+      requireCompleteProfile
+      allowedRoles={["renter"]}
+    >
+      <RenterLayout user={user} />
+    </ProtectedRoute>
+  }
+/>
 
         {/* =========================
             FALLBACK
