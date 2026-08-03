@@ -6,6 +6,7 @@ import {
   Avatar,
   PrimaryButton,
   GhostButton,
+  Input,
 } from "../../components/ui";
 
 function DetailRow({ label, value }) {
@@ -36,8 +37,11 @@ export default function UnitDetail({ navigate, params }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [inviteCopied, setInviteCopied] = useState(false);
-  const [generatingInvite, setGeneratingInvite] = useState(false);
+  // Invitation state
+  const [renterEmail, setRenterEmail] = useState("");
+  const [sendingInvite, setSendingInvite] = useState(false);
+  const [inviteMessage, setInviteMessage] = useState("");
+  const [inviteError, setInviteError] = useState("");
 
   // Fetch property and unit
   useEffect(() => {
@@ -89,12 +93,24 @@ export default function UnitDetail({ navigate, params }) {
     }
   }, [propertyId, unitId]);
 
-  async function handleGenerateInvite() {
-    if (!unitId) return;
+  async function handleSendInvitation() {
+    // Clear old messages
+    setInviteMessage("");
+    setInviteError("");
+
+    // Validate email
+    if (!renterEmail.trim()) {
+      setInviteError("Please enter the renter's email address.");
+      return;
+    }
+
+    if (!renterEmail.includes("@")) {
+      setInviteError("Please enter a valid email address.");
+      return;
+    }
 
     try {
-      setGeneratingInvite(true);
-      setError("");
+      setSendingInvite(true);
 
       /*
         This assumes your backend has:
@@ -104,7 +120,8 @@ export default function UnitDetail({ navigate, params }) {
         and expects:
 
         {
-          unitId: unitId
+          unitId: unitId,
+          email: renterEmail
         }
 
         Change this endpoint/body if your invitation controller
@@ -119,6 +136,7 @@ export default function UnitDetail({ navigate, params }) {
         credentials: "include",
         body: JSON.stringify({
           unitId: unitId,
+          email: renterEmail.trim().toLowerCase(),
         }),
       });
 
@@ -126,34 +144,19 @@ export default function UnitDetail({ navigate, params }) {
 
       if (!response.ok) {
         throw new Error(
-          data.message || "Failed to generate invitation"
+          data.message || "Failed to send invitation."
         );
       }
 
-      // The backend should return the invitation link
-      const inviteLink =
-        data.inviteLink ||
-        data.invitationLink ||
-        data.url;
+      console.log("Invitation created:", data);
 
-      if (!inviteLink) {
-        throw new Error(
-          "Invitation was created, but no invitation link was returned."
-        );
-      }
-
-      await navigator.clipboard.writeText(inviteLink);
-
-      setInviteCopied(true);
-
-      setTimeout(() => {
-        setInviteCopied(false);
-      }, 2500);
+      setInviteMessage("Invitation sent successfully.");
+      setRenterEmail("");
     } catch (error) {
-      console.error("Failed to generate invitation:", error);
-      setError(error.message || "Failed to generate invitation");
+      console.error("Failed to send invitation:", error);
+      setInviteError(error.message || "Failed to send invitation");
     } finally {
-      setGeneratingInvite(false);
+      setSendingInvite(false);
     }
   }
 
@@ -353,31 +356,56 @@ export default function UnitDetail({ navigate, params }) {
             </div>
           </GlassCard>
         ) : (
-          <GlassCard className="p-5 flex flex-col items-center text-center">
-            <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-3 text-xl">
-              🔗
+          <GlassCard className="p-5">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-3 text-xl">
+                🔗
+              </div>
+
+              <p className="text-sm font-medium text-white mb-1">
+                No renter assigned
+              </p>
+
+              <p className="text-xs text-white/40 mb-4">
+                Enter the renter's email address to send
+                them an invitation to this unit.
+              </p>
             </div>
 
-            <p className="text-sm font-medium text-white mb-1">
-              No renter assigned
-            </p>
+            {/* Email input */}
+            <div className="mb-3">
+              <Input
+                label="Renter email"
+                type="email"
+                placeholder="renter@example.com"
+                value={renterEmail}
+                onChange={(e) => setRenterEmail(e.target.value)}
+              />
+            </div>
 
-            <p className="text-xs text-white/40 mb-4">
-              Generate an invitation link and share it
-              with your renter. They'll create an account
-              and be linked to this unit.
-            </p>
+            {/* Error message */}
+            {inviteError && (
+              <p className="text-xs text-red-400 mb-3">
+                {inviteError}
+              </p>
+            )}
 
+            {/* Success message */}
+            {inviteMessage && (
+              <p className="text-xs text-emerald-400 mb-3">
+                {inviteMessage}
+              </p>
+            )}
+
+            {/* Send invitation button */}
             <PrimaryButton
-              onClick={handleGenerateInvite}
+              onClick={handleSendInvitation}
               className="w-full"
-              disabled={generatingInvite}
+              disabled={sendingInvite}
             >
-              {generatingInvite
-                ? "Generating..."
-                : inviteCopied
-                ? "✓ Link copied to clipboard"
-                : "Generate invitation link"}
+              {sendingInvite
+                ? "Sending invitation..."
+                : "Send invitation"}
             </PrimaryButton>
           </GlassCard>
         )}

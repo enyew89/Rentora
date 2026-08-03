@@ -27,10 +27,13 @@ async function apiFetch(endpoint) {
   return data;
 }
 
-function PropertyCard({ property, onClick }) {
-  // Use the actual values returned from your backend
-  const totalUnits = property.totalUnits || 0;
-  const occupiedUnits = property.occupiedUnits || 0;
+// A unit's `property` field might be a raw ID or a populated object,
+// depending on the endpoint - handle both.
+function getPropertyId(unit) {
+  return unit.property?._id || unit.property;
+}
+
+function PropertyCard({ property, totalUnits, occupiedUnits, onClick }) {
   const vacantUnits = totalUnits - occupiedUnits;
 
   const occupancyPct =
@@ -98,20 +101,23 @@ function PropertyCard({ property, onClick }) {
 
 export default function Properties({ navigate }) {
   const [properties, setProperties] = useState([]);
+  const [units, setUnits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    async function fetchProperties() {
+    async function fetchData() {
       try {
         setLoading(true);
         setError("");
 
-        const data = await apiFetch("/properties");
+        const [propsData, unitsData] = await Promise.all([
+          apiFetch("/properties"),
+          apiFetch("/units/all"),
+        ]);
 
-        console.log("Properties received:", data);
-
-        setProperties(data);
+        setProperties(propsData);
+        setUnits(unitsData);
       } catch (err) {
         console.error("Failed to fetch properties:", err);
         setError(err.message);
@@ -120,7 +126,7 @@ export default function Properties({ navigate }) {
       }
     }
 
-    fetchProperties();
+    fetchData();
   }, []);
 
   return (
@@ -179,17 +185,29 @@ export default function Properties({ navigate }) {
       {/* Properties */}
       {!loading && !error && properties.length > 0 && (
         <div className="space-y-3">
-          {properties.map((property) => (
-            <PropertyCard
-              key={property._id}
-              property={property}
-              onClick={() =>
-                navigate("property-detail", {
-                  propertyId: property._id,
-                })
-              }
-            />
-          ))}
+          {properties.map((property) => {
+            const propertyUnits = units.filter(
+              (u) => getPropertyId(u) === property._id
+            );
+            const totalUnits = propertyUnits.length;
+            const occupiedUnits = propertyUnits.filter(
+              (u) => u.status === "occupied"
+            ).length;
+
+            return (
+              <PropertyCard
+                key={property._id}
+                property={property}
+                totalUnits={totalUnits}
+                occupiedUnits={occupiedUnits}
+                onClick={() =>
+                  navigate("property-detail", {
+                    propertyId: property._id,
+                  })
+                }
+              />
+            );
+          })}
         </div>
       )}
     </div>
