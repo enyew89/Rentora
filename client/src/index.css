@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+body {
+  background-color: #1a1a1a;
+  background-image: url("/black-linen-2.png");
+  background-repeat: repeat;
+  background-size: 640px 640px;
+  background-attachment: fixed;
+  background-blend-mode: screen;
+}

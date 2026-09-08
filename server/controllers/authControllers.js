@@ -16,15 +16,27 @@ function formatUser(user) {
   };
 }
 
+function normalizeEmail(email) {
+  return email?.trim().toLowerCase();
+}
+
 exports.register = async function (req, res) {
   const { email, password } = req.body;
+  const normalizedEmail = normalizeEmail(email);
 
-  if (!email || !password) {
+  if (!normalizedEmail || !password) {
     return res.status(400).json({ message: "Email and password are required" });
   }
 
   try {
-    const user = new User({ username: email, role: "landlord" });
+    const existingUser = await User.findOne({ username: normalizedEmail });
+    if (existingUser) {
+      return res
+        .status(409)
+        .json({ message: "An account with that email already exists" });
+    }
+
+    const user = new User({ username: normalizedEmail, role: "landlord" });
     const registeredUser = await User.register(user, password);
 
     req.login(registeredUser, function (err) {
@@ -36,7 +48,7 @@ exports.register = async function (req, res) {
       }
 
       sendEmail(
-        email,
+        normalizedEmail,
         "Welcome to Rentora",
         "Welcome to Rentora! Your account has been created successfully.",
       );
@@ -56,12 +68,13 @@ exports.register = async function (req, res) {
 
 exports.login = function (req, res, next) {
   const { email, password } = req.body;
+  const normalizedEmail = normalizeEmail(email);
 
-  if (!email || !password) {
+  if (!normalizedEmail || !password) {
     return res.status(400).json({ message: "Email and password are required" });
   }
 
-  req.body.username = email;
+  req.body.username = normalizedEmail;
 
   passport.authenticate("local", function (err, user, info) {
     if (err) {

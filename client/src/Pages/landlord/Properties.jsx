@@ -48,7 +48,7 @@ function PropertyCard({ property, totalUnits, occupiedUnits, onClick }) {
     >
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h3 className="text-base font-medium text-white group-hover:text-blue-300 transition-colors">
+          <h3 className="text-base font-medium text-white group-hover:text-neutral-300 transition-colors">
             {property.name}
           </h3>
 
@@ -66,7 +66,7 @@ function PropertyCard({ property, totalUnits, occupiedUnits, onClick }) {
       <div className="mb-3">
         <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
           <div
-            className="h-full bg-blue-500/70 rounded-full transition-all"
+            className="h-full bg-neutral-400/70 rounded-full transition-all"
             style={{ width: `${occupancyPct}%` }}
           />
         </div>
@@ -80,18 +80,18 @@ function PropertyCard({ property, totalUnits, occupiedUnits, onClick }) {
 
           <span className="text-white/20">·</span>
 
-          <span className="text-emerald-400">
+          <span className="text-neutral-300">
             {occupiedUnits} occupied
           </span>
 
           <span className="text-white/20">·</span>
 
-          <span className="text-amber-400">
+          <span className="text-neutral-400">
             {vacantUnits} vacant
           </span>
         </div>
 
-        <span className="text-xs text-blue-400 group-hover:translate-x-0.5 transition-transform">
+        <span className="text-xs text-neutral-400 group-hover:translate-x-0.5 transition-transform">
           View →
         </span>
       </div>
@@ -153,13 +153,13 @@ export default function Properties({ navigate }) {
       {/* Error */}
       {!loading && error && (
         <GlassCard className="p-8 text-center">
-          <p className="text-sm text-red-400">
+          <p className="text-sm text-neutral-400">
             Failed to load properties: {error}
           </p>
 
           <button
             onClick={() => window.location.reload()}
-            className="mt-4 text-sm text-blue-400 hover:text-blue-300"
+            className="mt-4 text-sm text-neutral-400 hover:text-neutral-300"
           >
             Try again
           </button>

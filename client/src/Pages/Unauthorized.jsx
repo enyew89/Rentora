@@ -2,9 +2,9 @@ import { Link } from "react-router-dom";
 
 export default function Unauthorized() {
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center px-6">
+    <div className="min-h-screen bg-transparent text-white flex items-center justify-center px-6">
       <div className="text-center max-w-md">
-        <h1 className="text-6xl font-bold text-red-500 mb-4">
+        <h1 className="text-6xl font-bold text-neutral-400 mb-4">
           403
         </h1>
 
@@ -18,7 +18,7 @@ export default function Unauthorized() {
 
         <Link
           to="/"
-          className="inline-block px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 transition"
+          className="inline-block px-6 py-3 rounded-xl bg-neutral-500 hover:bg-neutral-400 transition"
         >
           Go Home
         </Link>

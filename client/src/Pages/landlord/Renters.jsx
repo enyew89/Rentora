@@ -1,8 +1,21 @@
 import { useState, useEffect } from "react";
-import { GlassCard, PageHeader, Badge, Avatar, EmptyState } from "../../components/ui";
+import {
+  GlassCard,
+  PageHeader,
+  Badge,
+  Avatar,
+  EmptyState,
+} from "../../components/ui";
 
-function initials(name = "") {
-  return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+function initials(r) {
+  const first = r.renter?.firstName?.[0] ?? "";
+  const last = r.renter?.lastName?.[0] ?? "";
+  return (first + last).toUpperCase() || "?";
+}
+
+function renterName(r) {
+  const { firstName, lastName } = r.renter ?? {};
+  return [firstName, lastName].filter(Boolean).join(" ") || "Unknown";
 }
 
 function SkeletonRow() {
@@ -23,12 +36,14 @@ function SkeletonRow() {
 export default function Renters({ navigate }) {
   const [renters, setRenters] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState(null);
+  const [error, setError] = useState(null);
+
+  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
   useEffect(() => {
     async function fetchRenters() {
       try {
-        const res = await fetch("/api/renters", { credentials: "include" });
+        const res = await fetch(`${BASE_URL}/renters`, { credentials: "include" });
         if (!res.ok) throw new Error("Failed to fetch renters");
         const data = await res.json();
         setRenters(data);
@@ -41,26 +56,20 @@ export default function Renters({ navigate }) {
     fetchRenters();
   }, []);
 
-  // ── Helper: pull fields whether the API returns flat or nested objects ───
-  function renterName(r)     { return r.name ?? r.user?.name ?? "Unknown"; }
-  function renterEmail(r)    { return r.email ?? r.user?.email ?? ""; }
-  function unitNumber(r)     { return r.unitNumber ?? r.unit?.unitNumber ?? "—"; }
-  function propertyName(r)   { return r.propertyName ?? r.unit?.property?.name ?? "Unknown"; }
-  function rentAmount(r)     { return r.rentAmount ?? r.unit?.rentAmount ?? 0; }
-  function propertyId(r)     { return r.propertyId ?? r.unit?.property?._id ?? ""; }
-  function unitId(r)         { return r.unitId ?? r.unit?._id ?? ""; }
-  function paymentStatus(r)  { return r.paymentStatus ?? r.lastPayment?.status ?? "Pending"; }
-
   return (
     <div className="space-y-5">
       <PageHeader
         title="My Renters"
-        subtitle={loading ? "Loading..." : `${renters.length} active renter${renters.length !== 1 ? "s" : ""}`}
+        subtitle={
+          loading
+            ? "Loading..."
+            : `${renters.length} active renter${renters.length !== 1 ? "s" : ""}`
+        }
       />
 
       {error ? (
-        <GlassCard className="p-6 text-center border-red-500/20">
-          <p className="text-red-400 text-sm">Failed to load renters.</p>
+        <GlassCard className="p-6 text-center border-neutral-500/20">
+          <p className="text-neutral-400 text-sm">Failed to load renters.</p>
           <button
             onClick={() => window.location.reload()}
             className="text-xs text-white/40 hover:text-white mt-2 transition-colors"
@@ -70,7 +79,9 @@ export default function Renters({ navigate }) {
         </GlassCard>
       ) : loading ? (
         <GlassCard className="divide-y divide-white/5 overflow-hidden">
-          {[...Array(4)].map((_, i) => <SkeletonRow key={i} />)}
+          {[...Array(4)].map((_, i) => (
+            <SkeletonRow key={i} />
+          ))}
         </GlassCard>
       ) : renters.length === 0 ? (
         <EmptyState
@@ -82,27 +93,41 @@ export default function Renters({ navigate }) {
         <GlassCard className="divide-y divide-white/5 overflow-hidden">
           {renters.map((r) => (
             <div
-              key={r._id ?? r.unitId}
+              key={r._id}
               className="flex items-center justify-between px-4 py-3.5 hover:bg-white/5 transition-colors cursor-pointer group"
-              onClick={() => navigate("unit-detail", { propertyId: propertyId(r), unitId: unitId(r) })}
+              onClick={() =>
+                navigate("unit-detail", {
+                  propertyId: r.unit?.property?._id,
+                  unitId: r.unit?._id,
+                })
+              }
             >
               <div className="flex items-center gap-3">
-                <Avatar initials={initials(renterName(r))} />
+                <Avatar initials={initials(r)} />
                 <div>
-                  <p className="text-sm font-medium text-white group-hover:text-blue-300 transition-colors">
+                  <p className="text-sm font-medium text-white group-hover:text-neutral-300 transition-colors">
                     {renterName(r)}
                   </p>
                   <p className="text-xs text-white/40">
-                    {propertyName(r)} · Unit {unitNumber(r)}
+                    {r.unit?.property?.name ?? "—"} · Unit{" "}
+                    {r.unit?.unitNumber ?? "—"}
                   </p>
                 </div>
               </div>
+
               <div className="flex items-center gap-4">
                 <div className="text-right hidden sm:block">
-                  <p className="text-sm text-white/70">{rentAmount(r).toLocaleString()} ETB</p>
+                  <p className="text-sm text-white/70">
+                    {(
+                      r.unit?.rentAmount ??
+                      r.lease?.monthlyRent ??
+                      0
+                    ).toLocaleString()}{" "}
+                    ETB
+                  </p>
                   <p className="text-xs text-white/30">per month</p>
                 </div>
-                <Badge status={paymentStatus(r)} />
+                <Badge status={r.lastPayment?.status ?? "pending"} />
               </div>
             </div>
           ))}

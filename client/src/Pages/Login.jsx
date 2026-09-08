@@ -7,7 +7,12 @@ import { FcGoogle } from "react-icons/fc";
 import { Button, Input } from "../components";
 import { loginSchema } from "../schemas/loginSchema";
 
-export default function Login() {
+function dashboardPathFor(user) {
+  if (user?.role === "renter") return "/renter/dashboard";
+  return "/landlord/dashboard";
+}
+
+export default function Login({ onAuthenticated }) {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,8 +43,10 @@ export default function Login() {
 
       if (response.ok) {
         const result = await response.json();
+        onAuthenticated?.(result.user);
+
         if (result.user?.profileComplete) {
-          navigate("/dashboard");
+          navigate(dashboardPathFor(result.user));
         } else {
           navigate("/complete-profile");
         }
@@ -56,11 +63,11 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-gray-100 overflow-hidden flex flex-col justify-center items-center px-4">
+    <div className="min-h-screen bg-transparent text-gray-100 overflow-hidden flex flex-col justify-center items-center px-4">
       {/* Animated background gradient */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-orange-600/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-red-600/5 rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/[0.03] rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/[0.03] rounded-full blur-3xl" />
       </div>
 
       {/* Main content */}
@@ -68,7 +75,7 @@ export default function Login() {
         {/* Logo and brand */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-red-600 to-orange-500 rounded-xl flex items-center justify-center font-bold text-lg text-white shadow-lg shadow-orange-500/20">
+            <div className="w-12 h-12 bg-gradient-to-br from-neutral-700 to-neutral-500 rounded-xl flex items-center justify-center font-bold text-lg text-white shadow-lg shadow-orange-500/20">
               R
             </div>
           </div>
@@ -79,7 +86,7 @@ export default function Login() {
         {/* Premium Card */}
         <div className="group relative">
           {/* Glow effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-red-600/20 to-orange-500/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
           {/* Card */}
           <div className="relative bg-gray-900/60 backdrop-blur-2xl border border-gray-800/60 rounded-3xl p-8 shadow-2xl overflow-hidden">
@@ -120,7 +127,7 @@ export default function Login() {
                     </label>
                     <Link
                       to="/forgot-password"
-                      className="text-xs text-orange-500 hover:text-orange-400 transition-colors"
+                      className="text-xs text-neutral-400 hover:text-neutral-400 transition-colors"
                     >
                       Forgot?
                     </Link>
@@ -178,7 +185,7 @@ export default function Login() {
                 Don't have an account?{" "}
                 <Link
                   to="/register"
-                  className="text-orange-500 hover:text-orange-400 font-semibold transition-colors"
+                  className="text-neutral-400 hover:text-neutral-400 font-semibold transition-colors"
                 >
                   Sign up
                 </Link>

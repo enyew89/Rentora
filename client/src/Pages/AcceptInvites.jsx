@@ -154,7 +154,7 @@ export default function AcceptInvite() {
               ⚠️
             </div>
             <p style={styles.heading}>Invitation invalid</p>
-            <p style={styles.muted}>{errorMsg}</p>
+            <p style={{ ...styles.muted, color: "#f87171" }}>{errorMsg}</p>
             <p style={{ ...styles.muted, marginTop: 16, fontSize: 12, opacity: 0.5 }}>
               Ask your landlord to send a new invitation link.
             </p>

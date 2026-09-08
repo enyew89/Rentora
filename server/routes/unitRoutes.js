@@ -20,7 +20,10 @@ router.get("/all", async (req, res) => {
   try {
     const properties = await Property.find({ landlord: req.user._id }).select("_id");
     const propertyIds = properties.map((p) => p._id);
-    const units = await Unit.find({ property: { $in: propertyIds } });
+    const units = await Unit.find({ property: { $in: propertyIds } }).populate(
+      "renter",
+      "firstName lastName username phoneNumber role"
+    );
     res.json(units);
   } catch (err) {
     res.status(500).json({ message: err.message });

@@ -13,8 +13,10 @@ async function apiFetch(endpoint) {
   return data;
 }
 
-function initials(name = "") {
-  return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+function initials(p) {
+  const first = p.renter?.firstName?.[0] ?? "";
+  const last = p.renter?.lastName?.[0] ?? "";
+  return (first + last).toUpperCase() || "?";
 }
 
 function DashboardSkeleton() {
@@ -68,10 +70,12 @@ export default function Dashboard({ navigate }) {
 
   if (loading) return <DashboardSkeleton />;
   if (error) return (
-    <div className="text-center py-20 text-red-400 text-sm">
+    <div className="text-center py-20 text-neutral-400 text-sm">
       Failed to load dashboard: {error}
     </div>
   );
+
+  const now = new Date();
 
   // ── derived numbers ──────────────────────────────────────────────
   const totalUnits   = units.length;
@@ -79,16 +83,26 @@ export default function Dashboard({ navigate }) {
   const vacant       = units.filter((u) => u.status === "available").length;
   const occupancyPct = totalUnits > 0 ? Math.round((occupied / totalUnits) * 100) : 0;
 
-  const collected = payments
+  // Only count payments due this month or earlier — no future records
+  const visiblePayments = payments.filter((p) => new Date(p.dueDate) <= now);
+
+  const collected = visiblePayments
     .filter((p) => p.status === "paid")
     .reduce((sum, p) => sum + p.amount, 0);
 
-  const pending = payments
-    .filter((p) => p.status === "pending" || p.status === "late")
+  const pending = visiblePayments
+    .filter((p) => p.status === "pending" || p.status === "overdue")
     .reduce((sum, p) => sum + p.amount, 0);
 
-  const recentPayments    = [...payments].sort((a, b) => new Date(b.paymentDate) - new Date(a.paymentDate)).slice(0, 3);
-  const recentMaintenance = [...maintenance].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
+  // Recent = last 3 paid payments sorted by paymentDate descending
+  const recentPayments = visiblePayments
+    .filter((p) => p.status === "paid")
+    .sort((a, b) => new Date(b.paymentDate) - new Date(a.paymentDate))
+    .slice(0, 3);
+
+  const recentMaintenance = [...maintenance]
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 3);
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
@@ -96,15 +110,15 @@ export default function Dashboard({ navigate }) {
   const stats = [
     { label: "Properties",  value: String(properties.length) },
     { label: "Total units", value: String(totalUnits) },
-    { label: "Occupied",    value: String(occupied), sub: `of ${totalUnits} units`, color: "text-emerald-400" },
-    { label: "Vacant",      value: String(vacant),   sub: "available now",          color: "text-amber-400"  },
+    { label: "Occupied",    value: String(occupied), sub: `of ${totalUnits} units`, color: "text-neutral-300" },
+    { label: "Vacant",      value: String(vacant),   sub: "available now",          color: "text-neutral-400"  },
   ];
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-medium text-white">{greeting}, Enyew 👋</h1>
+        <h1 className="text-2xl font-medium text-white">{greeting} 👋</h1>
         <p className="text-sm text-white/40 mt-1">Here's an overview of your properties.</p>
       </div>
 
@@ -121,7 +135,7 @@ export default function Dashboard({ navigate }) {
         </div>
         <div className="h-2 bg-white/5 rounded-full overflow-hidden">
           <div
-            className="h-full bg-blue-500 rounded-full transition-all duration-700"
+            className="h-full bg-neutral-400 rounded-full transition-all duration-700"
             style={{ width: `${occupancyPct}%` }}
           />
         </div>
@@ -133,15 +147,15 @@ export default function Dashboard({ navigate }) {
 
       {/* Finance cards */}
       <div className="grid grid-cols-2 gap-3">
-        <GlassCard className="p-4 border-emerald-500/20">
+        <GlassCard className="p-4 border-white/20">
           <p className="text-xs text-white/40 mb-2">Rent collected</p>
-          <p className="text-xl font-medium text-emerald-400">
+          <p className="text-xl font-medium text-neutral-300">
             {collected.toLocaleString()} <span className="text-sm font-normal text-white/30">ETB</span>
           </p>
         </GlassCard>
-        <GlassCard className="p-4 border-amber-500/20">
+        <GlassCard className="p-4 border-neutral-500/20">
           <p className="text-xs text-white/40 mb-2">Pending rent</p>
-          <p className="text-xl font-medium text-amber-400">
+          <p className="text-xl font-medium text-neutral-400">
             {pending.toLocaleString()} <span className="text-sm font-normal text-white/30">ETB</span>
           </p>
         </GlassCard>
@@ -151,31 +165,46 @@ export default function Dashboard({ navigate }) {
       <div>
         <div className="flex items-center justify-between mb-2">
           <p className="text-sm font-medium text-white/60">Recent payments</p>
-          <button onClick={() => navigate("payments")} className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
+          <button
+            onClick={() => navigate("payments")}
+            className="text-xs text-neutral-400 hover:text-neutral-300 transition-colors"
+          >
             View all →
           </button>
         </div>
 
         {recentPayments.length === 0 ? (
-          <GlassCard className="p-6 text-center text-sm text-white/30">No payments recorded yet.</GlassCard>
+          <GlassCard className="p-6 text-center text-sm text-white/30">
+            No payments recorded yet.
+          </GlassCard>
         ) : (
           <GlassCard className="divide-y divide-white/5">
             {recentPayments.map((p) => {
-              const renterName = `${p.renter?.firstName ?? ""} ${p.renter?.lastName ?? ""}`.trim() || p.renter?.email || "—";
+              const renterName = `${p.renter?.firstName ?? ""} ${p.renter?.lastName ?? ""}`.trim() || "—";
               const unitLabel  = p.lease?.unit?.unitNumber ? `Unit ${p.lease.unit.unitNumber}` : "—";
+              const monthLabel = new Date(p.dueDate).toLocaleDateString("en-US", {
+                month: "short",
+                year: "numeric",
+              });
               return (
                 <div key={p._id} className="flex items-center justify-between px-4 py-3">
                   <div className="flex items-center gap-3">
-                    <Avatar initials={initials(renterName)} size="sm" />
+                    <Avatar initials={initials(p)} size="sm" />
                     <div>
                       <p className="text-sm font-medium text-white">{renterName}</p>
-                      <p className="text-xs text-white/40">{unitLabel}</p>
+                      <p className="text-xs text-white/40">{unitLabel} · {monthLabel}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium text-emerald-400">+{p.amount.toLocaleString()} ETB</p>
+                    <p className="text-sm font-medium text-neutral-300">
+                      +{p.amount.toLocaleString()} ETB
+                    </p>
                     <p className="text-xs text-white/30">
-                      {p.paymentDate ? new Date(p.paymentDate).toLocaleDateString() : "—"}
+                      {p.paymentDate
+                        ? new Date(p.paymentDate).toLocaleDateString("en-US", {
+                            month: "short", day: "numeric",
+                          })
+                        : "—"}
                     </p>
                   </div>
                 </div>
@@ -189,23 +218,32 @@ export default function Dashboard({ navigate }) {
       <div>
         <div className="flex items-center justify-between mb-2">
           <p className="text-sm font-medium text-white/60">Recent maintenance</p>
-          <button onClick={() => navigate("maintenance")} className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
+          <button
+            onClick={() => navigate("maintenance")}
+            className="text-xs text-neutral-400 hover:text-neutral-300 transition-colors"
+          >
             View all →
           </button>
         </div>
 
         {recentMaintenance.length === 0 ? (
-          <GlassCard className="p-6 text-center text-sm text-white/30">No maintenance requests yet.</GlassCard>
+          <GlassCard className="p-6 text-center text-sm text-white/30">
+            No maintenance requests yet.
+          </GlassCard>
         ) : (
           <GlassCard className="divide-y divide-white/5">
             {recentMaintenance.map((m) => (
               <div key={m._id} className="flex items-center justify-between px-4 py-3">
                 <div>
                   <p className="text-sm font-medium text-white">{m.title}</p>
-                  <p className="text-xs text-white/40">{m.unit?.unitNumber ? `Unit ${m.unit.unitNumber}` : "—"}</p>
+                  <p className="text-xs text-white/40">
+                    {m.unit?.unitNumber ? `Unit ${m.unit.unitNumber}` : "—"}
+                  </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-white/30">{new Date(m.createdAt).toLocaleDateString()}</span>
+                  <span className="text-xs text-white/30">
+                    {new Date(m.createdAt).toLocaleDateString()}
+                  </span>
                   <Badge status={m.status} />
                 </div>
               </div>

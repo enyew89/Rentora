@@ -1,6 +1,7 @@
 const Lease = require("../models/Lease.js");
 const User = require("../models/User.js");
 const Property = require("../models/Property.js");
+const Unit = require("../models/Unit.js");
 
 // GET /leases — landlord sees all active leases
 exports.getLeases = async (req, res) => {
@@ -12,10 +13,39 @@ exports.getLeases = async (req, res) => {
     const unitIds = units.map((u) => u._id);
 
     const leases = await Lease.find({ unit: { $in: unitIds } })
-      .populate("renter", "firstName lastName email phone")
+      .populate("renter", "firstName lastName username phoneNumber")
       .populate({ path: "unit", populate: { path: "property" } });
 
     res.json(leases);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// GET /leases/mine - renter sees their active lease
+exports.getMyLease = async (req, res) => {
+  try {
+    const lease = await Lease.findOne({
+      renter: req.user._id,
+      status: "active",
+    })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "unit",
+        populate: {
+          path: "property",
+          populate: {
+            path: "landlord",
+            select: "firstName lastName username phoneNumber",
+          },
+        },
+      });
+
+    if (!lease) {
+      return res.status(404).json({ message: "No active lease found." });
+    }
+
+    return res.json({ lease });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -25,7 +55,7 @@ exports.getLeases = async (req, res) => {
 exports.getLease = async (req, res) => {
   try {
     const lease = await Lease.findById(req.params.id)
-      .populate("renter", "firstName lastName email phone")
+      .populate("renter", "firstName lastName username phoneNumber")
       .populate({ path: "unit", populate: { path: "property" } });
 
     if (!lease) return res.status(404).json({ message: "Lease not found." });
@@ -66,6 +96,7 @@ exports.updateLease = async (req, res) => {
     // if terminated, free up the unit
     if (status === "terminated" || status === "expired") {
       lease.unit.status = "available";
+      lease.unit.renter = undefined;
       await lease.unit.save();
     }
 

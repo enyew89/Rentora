@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { GlassCard, PageHeader, PrimaryButton } from "../../components/ui";
 
 const STATUS_STYLES = {
-  paid: "text-emerald-400 bg-emerald-400/10",
+  paid: "text-neutral-300 bg-white/10",
   pending: "text-yellow-400 bg-yellow-400/10",
-  overdue: "text-red-400 bg-red-400/10",
+  overdue: "text-neutral-300 bg-neutral-400/10",
 };
 
 export default function RenterPayments() {
@@ -13,7 +13,6 @@ export default function RenterPayments() {
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
 
   useEffect(() => {
     async function fetchData() {
@@ -37,52 +36,58 @@ export default function RenterPayments() {
     fetchData();
   }, []);
 
+  const now = new Date();
+
+  // Next payment = earliest pending/overdue payment due this month or earlier
+  const nextPayment = payments
+    .filter((p) => (p.status === "pending" || p.status === "overdue") && new Date(p.dueDate) <= now)
+    .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))[0];
+
+  const nextDueDateLabel = nextPayment?.dueDate
+    ? new Date(nextPayment.dueDate).toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      })
+    : null;
+
+  // History = only payments whose dueDate is this month or earlier (not future months)
+  const visiblePayments = payments
+    .filter((p) => new Date(p.dueDate) <= now)
+    .sort((a, b) => new Date(b.dueDate) - new Date(a.dueDate)); // newest first
+
   async function handlePayRent() {
+    if (!nextPayment) return;
     setPaying(true);
     setError("");
-    setSuccessMsg("");
 
     try {
-      const res = await fetch("/api/payments", {
+      const res = await fetch("/api/payments/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ leaseId: lease._id }),
+        body: JSON.stringify({ paymentId: nextPayment._id }),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Payment failed.");
+      if (!res.ok) throw new Error(data.message || "Could not start payment.");
 
-      setSuccessMsg("Payment recorded successfully.");
-      setPayments((prev) => [data.payment || data, ...prev]);
+      window.location.href = data.checkoutUrl;
     } catch (err) {
       setError(err.message);
-    } finally {
       setPaying(false);
     }
   }
 
   if (loading) return <div className="text-sm text-white/40">Loading...</div>;
 
-  const nextPayment = new Date(
-    new Date().getFullYear(),
-    new Date().getMonth() + 1,
-    1
-  ).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
-
   return (
     <div className="space-y-5 max-w-lg">
       <PageHeader title="Payments" subtitle="Manage your rent payments" />
 
       {error && (
-        <div className="p-3 rounded-lg border border-red-500/20 bg-red-500/10 text-sm text-red-400">
+        <div className="p-3 rounded-lg border border-neutral-500/20 bg-neutral-500/10 text-sm text-neutral-400">
           {error}
-        </div>
-      )}
-
-      {successMsg && (
-        <div className="p-3 rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-sm text-emerald-400">
-          {successMsg}
         </div>
       )}
 
@@ -93,17 +98,35 @@ export default function RenterPayments() {
             <div>
               <p className="text-xs text-white/40 mb-1">Monthly Rent</p>
               <p className="text-2xl font-semibold text-white">
-                {Number(lease.monthlyRent).toLocaleString()} ETB
+                {Number(nextPayment?.amount ?? lease.monthlyRent).toLocaleString()} ETB
               </p>
-              <p className="text-xs text-white/30 mt-1">Next payment due {nextPayment}</p>
+              {nextDueDateLabel ? (
+                <p className="text-xs text-white/30 mt-1">Due {nextDueDateLabel}</p>
+              ) : (
+                <p className="text-xs text-neutral-300/70 mt-1">No payment due</p>
+              )}
             </div>
-            <span className="text-xs px-2.5 py-1 rounded-full bg-yellow-400/10 text-yellow-400 font-medium">
-              Pending
+            <span
+              className={`text-xs px-2.5 py-1 rounded-full font-medium ${
+                nextPayment
+                  ? STATUS_STYLES[nextPayment.status] ?? "text-white/40 bg-white/5"
+                  : "text-neutral-300 bg-white/10"
+              }`}
+            >
+              {nextPayment?.status ?? "Up to date"}
             </span>
           </div>
 
-          <PrimaryButton onClick={handlePayRent} className="w-full" disabled={paying}>
-            {paying ? "Processing..." : "Pay Rent"}
+          <PrimaryButton
+            onClick={handlePayRent}
+            className="w-full"
+            disabled={paying || !nextPayment}
+          >
+            {paying
+              ? "Redirecting to Chapa…"
+              : nextPayment
+              ? `Pay ${Number(nextPayment.amount).toLocaleString()} ETB`
+              : "No Payment Due"}
           </PrimaryButton>
         </GlassCard>
       ) : (
@@ -112,24 +135,22 @@ export default function RenterPayments() {
         </GlassCard>
       )}
 
-      {/* Payment history */}
+      {/* Payment history — only shows current month and earlier */}
       <div>
         <p className="text-sm font-medium text-white/60 mb-3">Payment History</p>
 
-        {payments.length === 0 ? (
+        {visiblePayments.length === 0 ? (
           <GlassCard className="p-5 text-center">
             <p className="text-sm text-white/30">No payments recorded yet.</p>
           </GlassCard>
         ) : (
           <div className="space-y-2">
-            {payments.map((p) => {
-              const date = p.paymentDate || p.createdAt;
-              const label = date
-                ? new Date(date).toLocaleDateString("en-US", {
-                    month: "long",
-                    year: "numeric",
-                  })
-                : "—";
+            {visiblePayments.map((p) => {
+              // Use dueDate as the label — it represents which month this payment is for
+              const label = new Date(p.dueDate).toLocaleDateString("en-US", {
+                month: "long",
+                year: "numeric",
+              });
 
               return (
                 <GlassCard key={p._id} className="p-4 flex items-center justify-between">
@@ -144,7 +165,7 @@ export default function RenterPayments() {
                       STATUS_STYLES[p.status] ?? "text-white/40 bg-white/5"
                     }`}
                   >
-                    {p.status ?? "paid"}
+                    {p.status}
                   </span>
                 </GlassCard>
               );

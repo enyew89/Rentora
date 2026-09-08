@@ -259,7 +259,7 @@ export default function InviteRenter({ navigate, params }) {
 
       {/* Error message */}
       {error && (
-        <div className="p-3 rounded-lg border border-red-500/20 bg-red-500/10 text-sm text-red-400">
+        <div className="p-3 rounded-lg border border-neutral-500/20 bg-neutral-500/10 text-sm text-neutral-400">
           {error}
         </div>
       )}
@@ -310,7 +310,7 @@ export default function InviteRenter({ navigate, params }) {
 
             <div className="flex flex-col items-center text-center py-2">
 
-              <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-4 text-2xl">
+              <div className="w-14 h-14 rounded-2xl bg-neutral-500/10 border border-neutral-500/20 flex items-center justify-center mb-4 text-2xl">
                 🔗
               </div>
 
@@ -361,7 +361,7 @@ export default function InviteRenter({ navigate, params }) {
 
             <div className="flex items-center gap-2 mb-1">
 
-              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <div className="w-2 h-2 rounded-full bg-neutral-400 animate-pulse" />
 
               <p className="text-sm font-medium text-white">
                 Invitation active
@@ -423,7 +423,7 @@ export default function InviteRenter({ navigate, params }) {
               <GhostButton
                 onClick={handleRevoke}
                 disabled={revoking}
-                className="text-red-400 border-red-500/20 hover:bg-red-500/5"
+                className="text-neutral-400 border-neutral-500/20 hover:bg-white/[0.04]"
               >
                 {revoking
                   ? "Revoking..."

@@ -21,7 +21,7 @@ export default function Input({
           type={isPassword && passwordVisible ? 'text' : type}
           placeholder={placeholder}
           className={`w-full px-4 py-2.5 bg-gray-900/50 border rounded-lg text-gray-100 placeholder-gray-500 transition-all focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent backdrop-blur-sm ${
-            error ? 'border-red-500/50' : 'border-gray-700/50'
+            error ? 'border-neutral-500/50' : 'border-gray-700/50'
           }`}
           {...props}
         />

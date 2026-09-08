@@ -137,12 +137,12 @@ export default function RenterProfile({ user }) {
         </div>
 
         {msg && (
-          <div className="mb-3 p-3 rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-sm text-emerald-400">
+          <div className="mb-3 p-3 rounded-lg border border-white/20 bg-white/10 text-sm text-neutral-300">
             {msg}
           </div>
         )}
         {error && (
-          <div className="mb-3 p-3 rounded-lg border border-red-500/20 bg-red-500/10 text-sm text-red-400">
+          <div className="mb-3 p-3 rounded-lg border border-neutral-500/20 bg-neutral-500/10 text-sm text-neutral-400">
             {error}
           </div>
         )}
@@ -221,12 +221,12 @@ export default function RenterProfile({ user }) {
         </div>
 
         {pwMsg && (
-          <div className="mb-3 p-3 rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-sm text-emerald-400">
+          <div className="mb-3 p-3 rounded-lg border border-white/20 bg-white/10 text-sm text-neutral-300">
             {pwMsg}
           </div>
         )}
         {pwError && (
-          <div className="mb-3 p-3 rounded-lg border border-red-500/20 bg-red-500/10 text-sm text-red-400">
+          <div className="mb-3 p-3 rounded-lg border border-neutral-500/20 bg-neutral-500/10 text-sm text-neutral-400">
             {pwError}
           </div>
         )}

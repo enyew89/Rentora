@@ -14,15 +14,15 @@ export function GlassCard({ children, className = "", onClick }) {
 
 export function Badge({ status }) {
   const styles = {
-    Occupied:      "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
-    occupied:      "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
-    Vacant:        "bg-amber-500/10  text-amber-400  border border-amber-500/20",
-    vacant:        "bg-amber-500/10  text-amber-400  border border-amber-500/20",
-    Open:          "bg-red-500/10    text-red-400    border border-red-500/20",
-    "In progress": "bg-blue-500/10   text-blue-400   border border-blue-500/20",
-    Done:          "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
-    Paid:          "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
-    Pending:       "bg-amber-500/10  text-amber-400  border border-amber-500/20",
+    Occupied:      "bg-white/10 text-neutral-300 border border-white/20",
+    occupied:      "bg-white/10 text-neutral-300 border border-white/20",
+    Vacant:        "bg-neutral-500/10  text-neutral-400  border border-neutral-500/20",
+    vacant:        "bg-neutral-500/10  text-neutral-400  border border-neutral-500/20",
+    Open:          "bg-neutral-500/10    text-neutral-400    border border-neutral-500/20",
+    "In progress": "bg-neutral-500/10   text-neutral-400   border border-neutral-500/20",
+    Done:          "bg-white/10 text-neutral-300 border border-white/20",
+    Paid:          "bg-white/10 text-neutral-300 border border-white/20",
+    Pending:       "bg-neutral-500/10  text-neutral-400  border border-neutral-500/20",
   };
   return (
     <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${styles[status] ?? "bg-white/10 text-white/50"}`}>
@@ -67,7 +67,7 @@ export function EmptyState({ icon, title, description, action }) {
 export function Avatar({ initials, size = "md" }) {
   const sz = size === "sm" ? "w-8 h-8 text-xs" : "w-10 h-10 text-sm";
   return (
-    <div className={`${sz} rounded-full bg-blue-500/20 text-blue-400 font-medium flex items-center justify-center flex-shrink-0`}>
+    <div className={`${sz} rounded-full bg-neutral-500/20 text-neutral-400 font-medium flex items-center justify-center flex-shrink-0`}>
       {initials}
     </div>
   );
@@ -89,7 +89,7 @@ export function PrimaryButton({ children, onClick, type = "button", className = 
     <button
       type={type}
       onClick={onClick}
-      className={`bg-blue-600 hover:bg-blue-500 active:scale-95 transition-all text-white text-sm font-medium px-4 py-2.5 rounded-xl ${className}`}
+      className={`bg-white hover:bg-neutral-200 active:scale-95 transition-all text-black text-sm font-medium px-4 py-2.5 rounded-xl ${className}`}
     >
       {children}
     </button>

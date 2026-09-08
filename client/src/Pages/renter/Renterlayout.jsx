@@ -6,6 +6,7 @@ import RenterMaintenance from "./RenterMaintenance";
 import NewMaintenanceRequest from "./NewMaintenanceRequest";
 import MaintenanceDetail from "./MaintenanceDetail";
 import RenterProfile from "./RenterProfile";
+import PaymentSuccess from "./PaymentSuccess";
 
 const NAV = [
   { id: "dashboard", label: "Dashboard", icon: "⊞" },
@@ -19,6 +20,7 @@ const ACTIVE_TAB = {
   dashboard: "dashboard",
   "my-home": "my-home",
   payments: "payments",
+  "payment-success": "payments",
   maintenance: "maintenance",
   "new-maintenance": "maintenance",
   "maintenance-detail": "maintenance",
@@ -33,6 +35,8 @@ function renderPage(route, navigate, user) {
       return <MyHome navigate={navigate} />;
     case "payments":
       return <RenterPayments navigate={navigate} />;
+    case "payment-success":
+      return <PaymentSuccess navigate={navigate} />;
     case "maintenance":
       return <RenterMaintenance navigate={navigate} />;
     case "new-maintenance":
@@ -59,15 +63,15 @@ export default function RenterLayout({ user }) {
   const activeTab = ACTIVE_TAB[route.name] ?? "dashboard";
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white flex">
+    <div className="min-h-screen bg-transparent text-white flex">
       {/* Ambient orb */}
-      <div className="pointer-events-none fixed top-[-150px] left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-emerald-700/8 rounded-full blur-[120px]" />
+      <div className="pointer-events-none fixed top-[-150px] left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-white/[0.03] rounded-full blur-[120px]" />
 
       {/* Sidebar (desktop) */}
       <aside className="hidden md:flex flex-col w-56 shrink-0 border-r border-white/5 bg-white/2 backdrop-blur-sm fixed left-0 top-0 h-full z-20 p-4">
         <div className="mb-8 px-2 pt-2">
           <span className="text-lg font-semibold tracking-tight text-white">Rentora</span>
-          <span className="text-emerald-400 text-lg">.</span>
+          <span className="text-neutral-300 text-lg">.</span>
         </div>
 
         <nav className="space-y-1 flex-1">
@@ -102,7 +106,7 @@ export default function RenterLayout({ user }) {
       {/* Mobile top bar */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3 border-b border-white/5 bg-[#0a0a0f]/90 backdrop-blur-md">
         <span className="text-base font-semibold text-white">
-          Rentora<span className="text-emerald-400">.</span>
+          Rentora<span className="text-neutral-300">.</span>
         </span>
         <button onClick={() => setMobileOpen(!mobileOpen)} className="text-white/60 hover:text-white p-1">
           {mobileOpen ? "✕" : "☰"}

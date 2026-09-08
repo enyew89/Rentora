@@ -1,5 +1,10 @@
 import { Navigate, useLocation } from "react-router-dom";
 
+function dashboardPathFor(user) {
+  if (user?.role === "renter") return "/renter/dashboard";
+  return "/landlord/dashboard";
+}
+
 export default function ProtectedRoute({
   children,
   user,
@@ -16,7 +21,7 @@ export default function ProtectedRoute({
 
   if (authStatus === "loading") {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <p className="text-gray-400">
           Loading...
         </p>
@@ -64,7 +69,7 @@ export default function ProtectedRoute({
   ) {
     return (
       <Navigate
-        to="/dashboard"
+        to={dashboardPathFor(user)}
         replace
       />
     );

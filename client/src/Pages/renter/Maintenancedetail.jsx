@@ -12,15 +12,15 @@ const STEP_LABELS = {
 const STATUS_STYLES = {
   open: "text-yellow-400 bg-yellow-400/10",
   pending: "text-yellow-400 bg-yellow-400/10",
-  "in-progress": "text-blue-400 bg-blue-400/10",
-  completed: "text-emerald-400 bg-emerald-400/10",
+  "in-progress": "text-neutral-300 bg-neutral-400/10",
+  completed: "text-neutral-300 bg-white/10",
 };
 
 const PRIORITY_STYLES = {
   low: "text-white/40",
   medium: "text-yellow-400",
-  high: "text-orange-400",
-  urgent: "text-red-400",
+  high: "text-neutral-400",
+  urgent: "text-neutral-400",
 };
 
 function Row({ label, value }) {
@@ -140,8 +140,8 @@ export default function MaintenanceDetail({ navigate, params }) {
                     className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
                       done
                         ? active
-                          ? "bg-blue-500 text-white"
-                          : "bg-emerald-500 text-white"
+                          ? "bg-neutral-400 text-white"
+                          : "bg-white text-black"
                         : "bg-white/8 text-white/20"
                     }`}
                   >
