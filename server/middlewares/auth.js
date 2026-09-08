@@ -3,12 +3,7 @@ exports.isAuthenticated = (req, res, next) => {
   res.status(401).json({ message: "Please log in." });
 };
 
-exports.isLandlord = (req, res, next) => {
-  if (req.user?.role === "landlord" || req.user?.role === "admin") return next();
-  res.status(403).json({ message: "Landlord access only." });
-};
-
-exports.isRenter = (req, res, next) => {
-  if (req.user?.role === "renter" || req.user?.role === "admin") return next();
-  res.status(403).json({ message: "Renter access only." });
-};
+// Role-based middleware removed. Authorization is now relationship-based:
+// - Landlord: Property.landlord === req.user._id
+// - Renter: Lease.renter === req.user._id
+// - Invitation: Invitation.renter === req.user._id

@@ -8,7 +8,7 @@ import { Button, Input } from "../components";
 import { loginSchema } from "../schemas/loginSchema";
 
 function dashboardPathFor(user) {
-  if (user?.role === "renter") return "/renter/dashboard";
+  
   return "/landlord/dashboard";
 }
 
@@ -80,7 +80,7 @@ export default function Login({ onAuthenticated }) {
             </div>
           </div>
           <h1 className="text-2xl font-bold mb-2">Rentora</h1>
-          <p className="text-sm text-gray-500">Manage your rental business</p>
+          <p className="text-sm text-white/50">Manage your rental business</p>
         </div>
 
         {/* Premium Card */}
@@ -100,7 +100,7 @@ export default function Login({ onAuthenticated }) {
                 <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                   Welcome Back
                 </h2>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-white/50">
                   Log in to manage your properties
                 </p>
               </div>
@@ -127,7 +127,7 @@ export default function Login({ onAuthenticated }) {
                     </label>
                     <Link
                       to="/forgot-password"
-                      className="text-xs text-neutral-400 hover:text-neutral-400 transition-colors"
+                      className="text-sm text-neutral-300 hover:text-neutral-400 transition-colors"
                     >
                       Forgot?
                     </Link>
@@ -161,7 +161,7 @@ export default function Login({ onAuthenticated }) {
                     <div className="w-full border-t border-gray-700/50" />
                   </div>
                   <div className="relative flex justify-center">
-                    <span className="px-2 bg-gray-900/60 text-xs text-gray-500 uppercase tracking-wider">
+                    <span className="px-2 bg-gray-900/60 text-xs text-white/50 uppercase tracking-wider">
                       Or
                     </span>
                   </div>
@@ -181,7 +181,7 @@ export default function Login({ onAuthenticated }) {
               </form>
 
               {/* Sign up link */}
-              <p className="text-center text-xs text-gray-500 pt-2">
+              <p className="text-center text-xs text-white/50 pt-2">
                 Don't have an account?{" "}
                 <Link
                   to="/register"
@@ -195,7 +195,7 @@ export default function Login({ onAuthenticated }) {
         </div>
 
         {/* Footer text */}
-        <p className="text-center text-xs text-gray-600 mt-8">
+        <p className="text-center text-xs text-white/40 mt-8">
           By continuing, you agree to our Terms and Privacy Policy
         </p>
       </div>

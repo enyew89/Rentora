@@ -8,7 +8,7 @@ const {
   webhook,
   updatePayment,
 } = require("../controllers/paymentControllers.js");
-const { isAuthenticated, isLandlord, isRenter } = require("../middlewares/auth.js");
+const { isAuthenticated } = require("../middlewares/auth.js");
 
 const router = express.Router();
 
@@ -18,11 +18,11 @@ router.post("/webhook", webhook);
 // ─── PROTECTED ─────────────────────────────────────────────────
 router.use(isAuthenticated);
 
-router.get("/mine", isRenter, getMyPayments);
-router.get("/", isLandlord, getPayments);
-router.post("/", isLandlord, createPayment);              // manual cash/cheque recording
-router.post("/initialize", isRenter, initializePayment); // renter starts Chapa payment
-router.get("/verify/:tx_ref", isRenter, verifyPayment);  // renter checks payment status
-router.patch("/:id", isLandlord, updatePayment);
+router.get("/mine", getMyPayments);
+router.get("/", getPayments);
+router.post("/", createPayment);
+router.post("/initialize", initializePayment);
+router.get("/verify/:tx_ref", verifyPayment);
+router.patch("/:id", updatePayment);
 
 module.exports = router;

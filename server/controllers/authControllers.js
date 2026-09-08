@@ -1,7 +1,9 @@
 const passport = require("passport");
 const User = require("../models/User.js");
 const sendEmail = require("../config/nodemailer.js");
-const {isAuthenticated, isLandlord, isRenter} = require("../middlewares/auth.js");
+const { isAuthenticated } = require("../middlewares/auth.js");
+const Property = require("../models/Property.js");
+const Lease = require("../models/Lease.js");
 
 function formatUser(user) {
   return {
@@ -10,9 +12,9 @@ function formatUser(user) {
     firstName: user.firstName,
     lastName: user.lastName,
     phoneNumber: user.phoneNumber,
-    role: user.role,
     profileComplete: user.profileComplete,
-    
+    hasProperties: user._hasProperties || false,
+    hasLeases: user._hasLeases || false,
   };
 }
 
@@ -36,7 +38,7 @@ exports.register = async function (req, res) {
         .json({ message: "An account with that email already exists" });
     }
 
-    const user = new User({ username: normalizedEmail, role: "landlord" });
+    const user = new User({ username: normalizedEmail });
     const registeredUser = await User.register(user, password);
 
     req.login(registeredUser, function (err) {
@@ -135,18 +137,22 @@ exports.completeProfile = async function (req, res) {
 exports.getCurrentUser = async function (req, res) {
   try {
     if (!req.isAuthenticated()) {
-      return res.status(401).json({
-        message: "Unauthorized",
-      });
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
     const freshUser = await User.findById(req.user._id).select("+hash +salt");
-    console.log("Fetched current user:", freshUser.hash ? "Has password" : "No password");
     if (!freshUser) {
-      return res.status(404).json({
-        message: "User not found",
-      });
+      return res.status(404).json({ message: "User not found" });
     }
+
+    // Check what this user can do based on relationships
+    const [hasProperties, hasLeases] = await Promise.all([
+      Property.exists({ landlord: freshUser._id }),
+      Lease.exists({ renter: freshUser._id }),
+    ]);
+
+    freshUser._hasProperties = !!hasProperties;
+    freshUser._hasLeases = !!hasLeases;
 
     return res.status(200).json({
       user: formatUser(freshUser),
@@ -154,10 +160,7 @@ exports.getCurrentUser = async function (req, res) {
     });
   } catch (err) {
     console.error("GET CURRENT USER ERROR:", err);
-
-    return res.status(500).json({
-      message: "Failed to get current user",
-    });
+    return res.status(500).json({ message: "Failed to get current user" });
   }
 };
 

@@ -3,22 +3,22 @@ const router = express.Router();
 const {
   createInvitation,
   getInvitations,
-  getInvitation,
-  registerFromInvitation,
+  getMyInvitations,
+  acceptInvitation,
+  declineInvitation,
   cancelInvitation,
 } = require("../controllers/invitationControllers.js");
 
-const { isAuthenticated, isLandlord, isRenter} = require("../middlewares/auth.js");
+const { isAuthenticated } = require("../middlewares/auth.js");
 
-// ── Landlord routes (protected) ───────────────────────────────────────────────
+// ── Landlord routes ──────────────────────────────────────────────────────
 router.post("/", isAuthenticated, createInvitation);
 router.get("/", isAuthenticated, getInvitations);
 router.delete("/:id", isAuthenticated, cancelInvitation);
 
-// ── Public routes — no login required ─────────────────────────────────────────
-// IMPORTANT: /accept must be defined BEFORE /:token
-// otherwise Express matches "accept" as the token
-router.post("/accept", registerFromInvitation);
-router.get("/:token", getInvitation);
+// ── Renter routes ────────────────────────────────────────────────────────
+router.get("/mine", isAuthenticated, getMyInvitations);
+router.patch("/:id/accept", isAuthenticated, acceptInvitation);
+router.patch("/:id/decline", isAuthenticated, declineInvitation);
 
 module.exports = router;

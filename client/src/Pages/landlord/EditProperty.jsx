@@ -118,7 +118,7 @@ export default function EditProperty({ navigate, params }) {
   const isValid = form.name.trim() && form.address.trim();
 
   if (loading) {
-    return <div className="text-sm text-white/40">Loading property...</div>;
+    return <div className="text-base text-white/60">Loading property...</div>;
   }
 
   return (

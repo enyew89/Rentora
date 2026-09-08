@@ -51,16 +51,16 @@ export default function LandlordDashboard() {
         {/* Header */}
         <div>
           <h1 className="text-2xl font-medium text-white">Good morning 👋</h1>
-          <p className="text-sm text-white/40 mt-1">Here's what's happening across your properties.</p>
+          <p className="text-base text-white/60 mt-1">Here's what's happening across your properties.</p>
         </div>
 
         {/* Stat cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {stats.map((s) => (
             <GlassCard key={s.label} className="p-4">
-              <p className="text-xs text-white/40 mb-2">{s.label}</p>
+              <p className="text-sm text-white/50 mb-2">{s.label}</p>
               <p className={`text-2xl font-medium ${s.color ?? "text-white"}`}>{s.value}</p>
-              {s.sub && <p className="text-xs text-white/30 mt-1">{s.sub}</p>}
+              {s.sub && <p className="text-sm text-white/50 mt-1">{s.sub}</p>}
             </GlassCard>
           ))}
         </div>
@@ -68,8 +68,8 @@ export default function LandlordDashboard() {
         {/* Occupancy bar */}
         <GlassCard className="p-4">
           <div className="flex justify-between items-center mb-3">
-            <span className="text-sm font-medium text-white/80">Occupancy rate</span>
-            <span className="text-sm text-white/40">{occupancyPct}%</span>
+            <span className="text-base font-semibold text-white">Occupancy rate</span>
+            <span className="text-base text-white/60">{occupancyPct}%</span>
           </div>
           <div className="h-2 bg-white/5 rounded-full overflow-hidden">
             <div
@@ -78,21 +78,21 @@ export default function LandlordDashboard() {
             />
           </div>
           <div className="flex justify-between mt-2">
-            <span className="text-xs text-white/30">19 occupied</span>
-            <span className="text-xs text-white/30">5 vacant</span>
+            <span className="text-sm text-white/50">19 occupied</span>
+            <span className="text-sm text-white/50">5 vacant</span>
           </div>
         </GlassCard>
 
         {/* Finance cards */}
         <div className="grid grid-cols-2 gap-3">
           <GlassCard className="p-4 border-white/20">
-            <p className="text-xs text-white/40 mb-2">Rent collected</p>
+            <p className="text-sm text-white/50 mb-2">Rent collected</p>
             <p className="text-xl font-medium text-neutral-300">
               85,000 <span className="text-sm font-normal text-white/40">ETB</span>
             </p>
           </GlassCard>
           <GlassCard className="p-4 border-neutral-500/20">
-            <p className="text-xs text-white/40 mb-2">Pending rent</p>
+            <p className="text-sm text-white/50 mb-2">Pending rent</p>
             <p className="text-xl font-medium text-neutral-400">
               15,000 <span className="text-sm font-normal text-white/40">ETB</span>
             </p>
@@ -101,7 +101,7 @@ export default function LandlordDashboard() {
 
         {/* Recent Payments */}
         <div>
-          <p className="text-sm font-medium text-white/60 mb-2">Recent payments</p>
+          <p className="text-base font-semibold text-white/80 mb-2">Recent payments</p>
           <GlassCard className="overflow-hidden divide-y divide-white/5">
             {payments.map((p) => (
               <div key={p.name} className="flex items-center justify-between px-4 py-3">
@@ -111,18 +111,18 @@ export default function LandlordDashboard() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-white">{p.name}</p>
-                    <p className="text-xs text-white/40">{p.unit}</p>
+                    <p className="text-sm text-white/50">{p.unit}</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-medium text-neutral-300">+{p.amount} ETB</p>
-                  <p className="text-xs text-white/30">{p.date}</p>
+                  <p className="text-sm text-white/50">{p.date}</p>
                 </div>
               </div>
             ))}
             <button
               onClick={() => setShowAllPayments(!showAllPayments)}
-              className="w-full py-3 text-xs text-white/30 hover:text-white/60 transition-colors"
+              className="w-full py-3 text-sm text-white/50 hover:text-white/60 transition-colors"
             >
               {showAllPayments ? "Show less" : "View all payments →"}
             </button>
@@ -131,7 +131,7 @@ export default function LandlordDashboard() {
 
         {/* Maintenance Requests */}
         <div>
-          <p className="text-sm font-medium text-white/60 mb-2">Recent maintenance</p>
+          <p className="text-base font-semibold text-white/80 mb-2">Recent maintenance</p>
           <GlassCard className="overflow-hidden divide-y divide-white/5">
             {maintenance.map((m) => (
               <div key={m.title} className="flex items-center justify-between px-4 py-3">
@@ -141,7 +141,7 @@ export default function LandlordDashboard() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-white">{m.title}</p>
-                    <p className="text-xs text-white/40">{m.unit}</p>
+                    <p className="text-sm text-white/50">{m.unit}</p>
                   </div>
                 </div>
                 <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${statusStyle[m.status]}`}>
@@ -151,7 +151,7 @@ export default function LandlordDashboard() {
             ))}
             <button
               onClick={() => setShowAllMaintenance(!showAllMaintenance)}
-              className="w-full py-3 text-xs text-white/30 hover:text-white/60 transition-colors"
+              className="w-full py-3 text-sm text-white/50 hover:text-white/60 transition-colors"
             >
               {showAllMaintenance ? "Show less" : "View all requests →"}
             </button>

@@ -125,11 +125,11 @@ export default function RenterProfile({ user }) {
       {/* Profile section */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <p className="text-sm font-medium text-white/60">My Profile</p>
+          <p className="text-base font-semibold text-white/80">My Profile</p>
           {!editing && (
             <button
               onClick={() => { setEditing(true); setMsg(""); setError(""); }}
-              className="text-xs text-white/40 hover:text-white transition-colors"
+              className="text-sm text-white/50 hover:text-white transition-colors"
             >
               Edit
             </button>
@@ -173,8 +173,8 @@ export default function RenterProfile({ user }) {
               />
               {/* Email is always read-only */}
               <div>
-                <p className="text-xs text-white/40 mb-1.5">Email</p>
-                <p className="text-sm text-white/30">{email}</p>
+                <p className="text-sm text-white/50 mb-1.5">Email</p>
+                <p className="text-base text-white/50">{email}</p>
               </div>
               <div className="flex gap-3 pt-1">
                 <GhostButton type="button" onClick={() => setEditing(false)}>
@@ -197,8 +197,8 @@ export default function RenterProfile({ user }) {
                   key={label}
                   className="flex justify-between items-center py-2.5 border-b border-white/5 last:border-0"
                 >
-                  <span className="text-sm text-white/40">{label}</span>
-                  <span className="text-sm text-white font-medium">{value}</span>
+                  <span className="text-base text-white/60">{label}</span>
+                  <span className="text-base text-white font-medium">{value}</span>
                 </div>
               ))}
             </div>
@@ -209,11 +209,11 @@ export default function RenterProfile({ user }) {
       {/* Password section */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <p className="text-sm font-medium text-white/60">Security</p>
+          <p className="text-base font-semibold text-white/80">Security</p>
           {!changingPw && (
             <button
               onClick={() => { setChangingPw(true); setPwMsg(""); setPwError(""); }}
-              className="text-xs text-white/40 hover:text-white transition-colors"
+              className="text-sm text-white/50 hover:text-white transition-colors"
             >
               Change password
             </button>
@@ -267,8 +267,8 @@ export default function RenterProfile({ user }) {
             </form>
           ) : (
             <div className="flex justify-between items-center">
-              <span className="text-sm text-white/40">Password</span>
-              <span className="text-sm text-white/30 tracking-widest">••••••••</span>
+              <span className="text-base text-white/60">Password</span>
+              <span className="text-base text-white/50 tracking-widest">••••••••</span>
             </div>
           )}
         </GlassCard>

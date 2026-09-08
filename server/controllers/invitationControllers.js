@@ -3,26 +3,13 @@ const Unit = require("../models/Unit.js");
 const Lease = require("../models/Lease.js");
 const User = require("../models/User.js");
 const Property = require("../models/Property.js");
-const Payment = require("../models/Payment.js"); // ← added
-const sendEmail = require("../config/nodemailer.js");
-
-function formatUser(user) {
-  return {
-    id: user._id,
-    email: user.username,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    phoneNumber: user.phoneNumber,
-    role: user.role,
-    profileComplete: user.profileComplete,
-  };
-}
+const Payment = require("../models/Payment.js");
 
 function normalizeEmail(email) {
   return email?.trim().toLowerCase();
 }
 
-// ─── POST /api/invitations ─────────────────────────────────────────────────────
+// ─── POST /api/invitations ─── Landlord invites a renter by email ─────────────
 exports.createInvitation = async (req, res) => {
   try {
     const { unitId, email } = req.body;
@@ -32,6 +19,7 @@ exports.createInvitation = async (req, res) => {
       return res.status(400).json({ message: "Unit ID and email are required." });
     }
 
+    // 1. Find unit and verify landlord ownership
     const unit = await Unit.findById(unitId).populate("property");
     if (!unit) return res.status(404).json({ message: "Unit not found." });
 
@@ -39,52 +27,61 @@ exports.createInvitation = async (req, res) => {
       return res.status(403).json({ message: "Forbidden." });
     }
 
+    // 2. Check unit is available
     if (unit.status !== "available") {
-      return res.status(400).json({ message: "Unit is not available." });
+      return res.status(400).json({ message: "This unit is already occupied." });
     }
 
-    const existingUser = await User.findOne({ username: normalizedEmail });
-    if (existingUser) {
-      return res.status(409).json({
-        message: "An account with this email already exists. Please invite a different email address.",
+    // 3. Find the renter by email — they MUST have an existing Rentora account
+    const renter = await User.findOne({ username: normalizedEmail });
+    if (!renter) {
+      return res.status(404).json({
+        message: "No Rentora account exists with this email.",
       });
     }
 
+    // 4. Check for existing pending invitation for this unit + renter
+    const existingPending = await Invitation.findOne({
+      unit: unitId,
+      renter: renter._id,
+      status: "pending",
+    });
+    if (existingPending) {
+      return res.status(400).json({
+        message: "This renter already has a pending invitation for this unit.",
+      });
+    }
+
+    // 5. Cancel any old pending invitations for this unit
     await Invitation.updateMany(
       { unit: unitId, status: "pending" },
       { status: "cancelled" }
     );
 
-    const invitation = await Invitation.create({ unit: unitId, email: normalizedEmail });
+    // 6. Create the invitation
+    const invitation = await Invitation.create({
+      unit: unitId,
+      landlord: req.user._id,
+      email: normalizedEmail,
+      renter: renter._id,
+    });
 
-    const inviteLink = `${process.env.CLIENT_URL}/accept-invite/${invitation.token}`;
-
-    sendEmail(
-      normalizedEmail,
-      "You've been invited to Rentora",
-      `You have been invited to rent Unit ${unit.unitNumber} at ${unit.property.name}.\n\nAccept your invitation here:\n${inviteLink}\n\nThis link expires in 7 days.`
-    );
-
-    res.status(201).json({ message: "Invitation sent.", inviteLink, invitation });
+    res.status(201).json({ message: "Invitation sent.", invitation });
   } catch (err) {
     console.error("createInvitation error:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
-// ─── GET /api/invitations ──────────────────────────────────────────────────────
+// ─── GET /api/invitations ─── Landlord sees all their invitations ─────────────
 exports.getInvitations = async (req, res) => {
   try {
-    const properties = await Property.find({ landlord: req.user._id }).select("_id");
-    const propertyIds = properties.map((p) => p._id);
-
-    const units = await Unit.find({ property: { $in: propertyIds } }).select("_id");
-    const unitIds = units.map((u) => u._id);
-
-    const invitations = await Invitation.find({ unit: { $in: unitIds } }).populate({
-      path: "unit",
-      populate: { path: "property" },
-    });
+    const invitations = await Invitation.find({ landlord: req.user._id })
+      .populate("renter", "firstName lastName username phoneNumber")
+      .populate({
+        path: "unit",
+        populate: { path: "property", select: "name address" },
+      });
 
     res.json(invitations);
   } catch (err) {
@@ -93,118 +90,78 @@ exports.getInvitations = async (req, res) => {
   }
 };
 
-// ─── GET /api/invitations/:token ───────────────────────────────────────────────
-exports.getInvitation = async (req, res) => {
+// ─── GET /api/invitations/mine ─── Renter sees their own invitations ──────────
+exports.getMyInvitations = async (req, res) => {
   try {
-    const invitation = await Invitation.findOne({ token: req.params.token }).populate({
-      path: "unit",
-      populate: { path: "property", select: "name address" },
-    });
+    const invitations = await Invitation.find({
+      renter: req.user._id,
+      status: "pending",
+    })
+      .populate("landlord", "firstName lastName username phoneNumber")
+      .populate({
+        path: "unit",
+        populate: { path: "property", select: "name address city" },
+      });
 
-    if (!invitation) {
-      return res.status(404).json({ message: "Invitation not found." });
-    }
-
-    if (invitation.status !== "pending") {
-      return res.status(400).json({ message: `This invitation is ${invitation.status}.` });
-    }
-
-    if (invitation.expiresAt < new Date()) {
-      invitation.status = "expired";
-      await invitation.save();
-      return res.status(400).json({ message: "This invitation has expired." });
-    }
-
-    return res.status(200).json({
-      invitation: {
-        email: invitation.email,
-        token: invitation.token,
-        expiresAt: invitation.expiresAt,
-        unit: {
-          unitNumber: invitation.unit.unitNumber,
-          rentAmount: invitation.unit.rentAmount,
-          bedrooms: invitation.unit.bedrooms,
-          bathrooms: invitation.unit.bathrooms,
-        },
-        property: {
-          name: invitation.unit.property.name,
-          address: invitation.unit.property.address,
-        },
-      },
-    });
+    res.json(invitations);
   } catch (err) {
-    console.error("getInvitation error:", err);
-    res.status(500).json({ message: "Failed to load invitation." });
+    console.error("getMyInvitations error:", err);
+    res.status(500).json({ message: err.message });
   }
 };
 
-// ─── POST /api/invitations/accept ─────────────────────────────────────────────
-exports.registerFromInvitation = async (req, res) => {
+// ─── PATCH /api/invitations/:id/accept ─── Renter accepts an invitation ───────
+exports.acceptInvitation = async (req, res) => {
   try {
-    const { token, firstName, lastName, phoneNumber, password } = req.body;
+    const invitation = await Invitation.findById(req.params.id);
 
-    if (!token || !firstName || !lastName || !phoneNumber || !password) {
-      return res.status(400).json({ message: "All fields are required." });
-    }
-
-    // 1. Find and validate invitation
-    const invitation = await Invitation.findOne({ token });
     if (!invitation) {
       return res.status(404).json({ message: "Invitation not found." });
     }
-    if (invitation.status !== "pending") {
-      return res.status(400).json({ message: `This invitation is ${invitation.status}.` });
+
+    // Verify this invitation belongs to the logged-in renter
+    if (invitation.renter.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Forbidden." });
     }
+
+    // Verify it's still pending
+    if (invitation.status !== "pending") {
+      return res.status(400).json({ message: "This invitation is no longer pending." });
+    }
+
+    // Verify it hasn't expired
     if (invitation.expiresAt < new Date()) {
       invitation.status = "expired";
       await invitation.save();
       return res.status(400).json({ message: "This invitation has expired." });
     }
 
-    // 2. Get unit
+    // Verify the unit is still available
     const unit = await Unit.findById(invitation.unit);
-    if (!unit) return res.status(404).json({ message: "Unit not found." });
+    if (!unit) {
+      return res.status(404).json({ message: "Unit not found." });
+    }
     if (unit.status !== "available") {
       return res.status(400).json({ message: "This unit is no longer available." });
     }
 
-    // 3. Check for existing account
-    const existing = await User.findOne({ username: invitation.email });
-    if (existing) {
-      return res.status(409).json({
-        message: "An account with this email already exists. Please log in instead.",
-      });
-    }
-
-    // 4. Create renter account
-    const user = new User({
-      username: invitation.email,
-      firstName,
-      lastName,
-      phoneNumber,
-      role: "renter",
-      profileComplete: true,
-    });
-    await user.setPassword(password);
-    await user.save();
-
-    // 5. Create lease
+    // Create the lease
     const lease = await Lease.create({
-      renter: user._id,
+      renter: req.user._id,
       unit: unit._id,
       invitation: invitation._id,
       startDate: new Date(),
       monthlyRent: unit.rentAmount,
     });
 
-    // 6. Generate monthly pending payment records for 12 months ── NEW
+    // Generate monthly pending payment records for 12 months
     const paymentDocs = [];
     for (let i = 0; i < 12; i++) {
       const dueDate = new Date(lease.startDate);
       dueDate.setMonth(dueDate.getMonth() + i);
       paymentDocs.push({
         lease: lease._id,
-        renter: user._id,
+        renter: req.user._id,
         amount: lease.monthlyRent,
         dueDate,
         status: "pending",
@@ -214,51 +171,58 @@ exports.registerFromInvitation = async (req, res) => {
     }
     await Payment.insertMany(paymentDocs);
 
-    // 7. Mark unit as occupied
+    // Mark unit as occupied
     unit.status = "occupied";
-    unit.renter = user._id;
+    unit.renter = req.user._id;
     await unit.save();
 
-    // 8. Mark invitation as accepted
+    // Mark invitation as accepted
     invitation.status = "accepted";
-    invitation.renter = user._id;
-    invitation.acceptedAt = new Date();
     await invitation.save();
 
-    // 9. Log renter in automatically
-    req.login(user, (err) => {
-      if (err) {
-        console.error("Auto-login after registration failed:", err);
-        return res.status(201).json({
-          message: "Account created. Please log in.",
-          autoLogin: false,
-        });
-      }
-
-      return res.status(201).json({
-        message: "Account created and invitation accepted.",
-        autoLogin: true,
-        user: formatUser(user),
-        lease,
-      });
-    });
+    res.json({ message: "Invitation accepted.", lease });
   } catch (err) {
-    console.error("registerFromInvitation error:", err);
-    res.status(500).json({ message: "Failed to create renter account." });
+    console.error("acceptInvitation error:", err);
+    res.status(500).json({ message: err.message });
   }
 };
 
-// ─── DELETE /api/invitations/:id ──────────────────────────────────────────────
+// ─── PATCH /api/invitations/:id/decline ─── Renter declines an invitation ─────
+exports.declineInvitation = async (req, res) => {
+  try {
+    const invitation = await Invitation.findById(req.params.id);
+
+    if (!invitation) {
+      return res.status(404).json({ message: "Invitation not found." });
+    }
+
+    // Verify this invitation belongs to the logged-in renter
+    if (invitation.renter.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Forbidden." });
+    }
+
+    if (invitation.status !== "pending") {
+      return res.status(400).json({ message: "This invitation is no longer pending." });
+    }
+
+    invitation.status = "declined";
+    await invitation.save();
+
+    res.json({ message: "Invitation declined." });
+  } catch (err) {
+    console.error("declineInvitation error:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ─── DELETE /api/invitations/:id ─── Landlord cancels an invitation ───────────
 exports.cancelInvitation = async (req, res) => {
   try {
-    const invitation = await Invitation.findById(req.params.id).populate({
-      path: "unit",
-      populate: { path: "property" },
-    });
+    const invitation = await Invitation.findById(req.params.id);
 
     if (!invitation) return res.status(404).json({ message: "Invitation not found." });
 
-    if (invitation.unit.property.landlord.toString() !== req.user._id.toString()) {
+    if (invitation.landlord.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: "Forbidden." });
     }
 

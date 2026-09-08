@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Building2, Send } from "lucide-react";
+import { Building2, Send, CheckCircle2, Loader2 } from "lucide-react";
 
 const navItems = [
   { name: 'Home', path: '/' },
@@ -16,6 +16,18 @@ const footerLinks = {
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Simulate a network request
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setSubmitted(true);
+    }, 1200);
+  };
 
   return (
     <div className="min-h-screen bg-transparent text-neutral-300 font-sans selection:bg-white/20">
@@ -60,7 +72,9 @@ export default function Contact() {
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
           <div className="max-w-2xl">
             <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-white">Contact us</h1>
-            <p className="mt-4 text-neutral-400">Drop us a message and we'll get back to you.</p>
+            <p className="mt-4 text-neutral-400">
+              Drop us a message and we'll get back to you within 24 hours. You can also reach us directly at <a href="mailto:support@rentora.com" className="text-white hover:underline">support@rentora.com</a>.
+            </p>
           </div>
         </div>
       </section>
@@ -68,20 +82,46 @@ export default function Contact() {
       <section className="py-16 sm:py-24 px-6 lg:px-12 border-t border-white/[0.04]">
         <div className="max-w-[700px] mx-auto">
           {submitted ? (
-            <div className="text-center py-16">
-              <p className="text-lg text-white font-medium mb-2">Thanks, we'll be in touch.</p>
-              <button onClick={() => setSubmitted(false)} className="mt-4 text-sm text-neutral-400 hover:text-white transition-colors">Send another</button>
+            <div className="flex flex-col items-center justify-center text-center py-16 px-6 bg-white/[0.02] border border-white/[0.06] rounded-2xl">
+              <CheckCircle2 size={48} className="text-green-400 mb-4" />
+              <h3 className="text-xl text-white font-bold mb-2">Message Sent!</h3>
+              <p className="text-neutral-400 mb-6 max-w-sm">Thanks for reaching out. We've received your message and will be in touch shortly.</p>
+              <button onClick={() => setSubmitted(false)} className="px-6 py-2 text-sm font-medium text-white bg-white/[0.08] rounded-full hover:bg-white/[0.12] transition-colors">
+                Send another message
+              </button>
             </div>
           ) : (
-            <form onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }} className="space-y-5">
-              <div className="grid sm:grid-cols-2 gap-4">
-                <input type="text" required placeholder="Name" className="w-full px-4 py-3 text-sm text-white bg-white/[0.04] border border-white/[0.08] rounded-xl placeholder:text-neutral-600 focus:outline-none focus:border-white/20 transition-all" />
-                <input type="email" required placeholder="Email" className="w-full px-4 py-3 text-sm text-white bg-white/[0.04] border border-white/[0.08] rounded-xl placeholder:text-neutral-600 focus:outline-none focus:border-white/20 transition-all" />
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid sm:grid-cols-2 gap-5">
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="name" className="text-sm font-medium text-neutral-300 ml-1">Name</label>
+                  <input id="name" type="text" required placeholder="John Doe" className="w-full px-4 py-3.5 text-sm text-white bg-white/[0.08] border border-white/20 rounded-xl placeholder:text-neutral-400 focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all" />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="email" className="text-sm font-medium text-neutral-300 ml-1">Email</label>
+                  <input id="email" type="email" required placeholder="john@example.com" className="w-full px-4 py-3.5 text-sm text-white bg-white/[0.08] border border-white/20 rounded-xl placeholder:text-neutral-400 focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all" />
+                </div>
               </div>
-              <textarea rows={4} required placeholder="Your message" className="w-full px-4 py-3 text-sm text-white bg-white/[0.04] border border-white/[0.08] rounded-xl placeholder:text-neutral-600 focus:outline-none focus:border-white/20 transition-all resize-none" />
-              <button type="submit" className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-black bg-white rounded-full shadow-lg shadow-white/20 hover:shadow-white/30 hover:scale-[1.03] active:scale-100 transition-all">
-                <Send size={14} />
-                Send
+              <div className="flex flex-col gap-2">
+                <label htmlFor="message" className="text-sm font-medium text-neutral-300 ml-1">Message</label>
+                <textarea id="message" rows={5} required placeholder="How can we help you?" className="w-full px-4 py-3.5 text-sm text-white bg-white/[0.08] border border-white/20 rounded-xl placeholder:text-neutral-400 focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all resize-none" />
+              </div>
+              <button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="inline-flex items-center gap-2 px-6 py-3.5 text-sm font-semibold text-black bg-white rounded-full shadow-lg shadow-white/20 hover:shadow-white/30 hover:scale-[1.03] active:scale-100 transition-all disabled:opacity-70 disabled:hover:scale-100 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send size={16} />
+                    Send Message
+                  </>
+                )}
               </button>
             </form>
           )}

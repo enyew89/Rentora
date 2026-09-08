@@ -12,8 +12,8 @@ import {
 function DetailRow({ label, value }) {
   return (
     <div className="flex justify-between items-center py-2.5 border-b border-white/5 last:border-0">
-      <span className="text-sm text-white/40">{label}</span>
-      <span className="text-sm text-white font-medium">{value}</span>
+      <span className="text-base text-white/60">{label}</span>
+      <span className="text-base text-white font-medium">{value}</span>
     </div>
   );
 }
@@ -153,7 +153,7 @@ export default function UnitDetail({ navigate, params }) {
     }
   }
 
-  if (loading) return <div className="text-sm text-white/40">Loading unit details...</div>;
+  if (loading) return <div className="text-base text-white/60">Loading unit details...</div>;
 
   if (error && !unit) {
     return (
@@ -196,10 +196,10 @@ export default function UnitDetail({ navigate, params }) {
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-2.5 mb-1">
-            <h1 className="text-xl font-medium text-white">Unit {unit.unitNumber}</h1>
+            <h1 className="text-2xl font-semibold text-white">Unit {unit.unitNumber}</h1>
             <Badge status={unit.status} />
           </div>
-          <p className="text-sm text-white/40">
+          <p className="text-base text-white/60">
             {property?.name} · {property?.address}
           </p>
         </div>
@@ -226,7 +226,7 @@ export default function UnitDetail({ navigate, params }) {
 
       {/* Renter section */}
       <div>
-        <p className="text-sm font-medium text-white/60 mb-2">Renter</p>
+        <p className="text-base font-semibold text-white/80 mb-2">Renter</p>
 
         {renter ? (
           <GlassCard className="p-4">
@@ -234,7 +234,7 @@ export default function UnitDetail({ navigate, params }) {
               <Avatar initials={initials(renter)} />
               <div>
                 <p className="text-sm font-medium text-white">{renterName || "Renter"}</p>
-                <p className="text-xs text-white/40">
+                <p className="text-sm text-white/50">
                   {renter?.username || renter?.email || ""}
                 </p>
               </div>
@@ -254,7 +254,7 @@ export default function UnitDetail({ navigate, params }) {
 
             {confirmRemove ? (
               <div className="mt-4 p-3 rounded-xl border border-neutral-500/20 bg-white/[0.04] space-y-3">
-                <p className="text-sm text-white/70">
+                <p className="text-base text-white/70">
                   This will terminate the lease and mark the unit as available. Are you sure?
                 </p>
                 <div className="flex gap-2">
@@ -267,7 +267,7 @@ export default function UnitDetail({ navigate, params }) {
                   </button>
                   <button
                     onClick={() => setConfirmRemove(false)}
-                    className="flex-1 py-2 rounded-xl border border-white/10 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-all"
+                    className="flex-1 py-2 rounded-xl border border-white/10 text-base text-white/70 hover:text-white hover:bg-white/5 transition-all"
                   >
                     Cancel
                   </button>
@@ -291,7 +291,7 @@ export default function UnitDetail({ navigate, params }) {
                 🔗
               </div>
               <p className="text-sm font-medium text-white mb-1">No renter assigned</p>
-              <p className="text-xs text-white/40 mb-4">
+              <p className="text-sm text-white/50 mb-4">
                 Enter the renter's email address to send them an invitation to this unit.
               </p>
             </div>
@@ -307,7 +307,7 @@ export default function UnitDetail({ navigate, params }) {
             </div>
 
             {inviteError && <p className="text-xs text-red-400 mb-3">{inviteError}</p>}
-            {inviteMessage && <p className="text-xs text-neutral-300 mb-3">{inviteMessage}</p>}
+            {inviteMessage && <p className="text-sm text-neutral-200 mb-3">{inviteMessage}</p>}
 
             <PrimaryButton onClick={handleSendInvitation} className="w-full" disabled={sendingInvite}>
               {sendingInvite ? "Sending invitation..." : "Send invitation"}

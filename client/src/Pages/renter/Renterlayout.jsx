@@ -6,12 +6,14 @@ import RenterMaintenance from "./RenterMaintenance";
 import NewMaintenanceRequest from "./NewMaintenanceRequest";
 import MaintenanceDetail from "./MaintenanceDetail";
 import RenterProfile from "./RenterProfile";
+import RenterInvitations from "./RenterInvitations";
 import PaymentSuccess from "./PaymentSuccess";
 
 const NAV = [
   { id: "dashboard", label: "Dashboard", icon: "⊞" },
   { id: "my-home", label: "My Home", icon: "🏡" },
   { id: "payments", label: "Payments", icon: "💳" },
+  { id: "invitations", label: "Invitations", icon: "📬" },
   { id: "maintenance", label: "Maintenance", icon: "🔧" },
   { id: "profile", label: "Profile", icon: "👤" },
 ];
@@ -23,6 +25,7 @@ const ACTIVE_TAB = {
   "payment-success": "payments",
   maintenance: "maintenance",
   "new-maintenance": "maintenance",
+  invitations: "invitations",
   "maintenance-detail": "maintenance",
   profile: "profile",
 };
@@ -33,6 +36,8 @@ function renderPage(route, navigate, user) {
       return <RenterDashboard navigate={navigate} user={user} />;
     case "my-home":
       return <MyHome navigate={navigate} />;
+    case "invitations":
+      return <RenterInvitations navigate={navigate} />;
     case "payments":
       return <RenterPayments navigate={navigate} />;
     case "payment-success":
@@ -82,7 +87,7 @@ export default function RenterLayout({ user }) {
               className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all ${
                 activeTab === item.id
                   ? "bg-white/8 text-white font-medium"
-                  : "text-white/40 hover:text-white/70 hover:bg-white/5"
+                  : "text-white/60 hover:text-white hover:bg-white/[0.06]"
               }`}
             >
               <span className="text-base">{item.icon}</span>
@@ -91,13 +96,21 @@ export default function RenterLayout({ user }) {
           ))}
         </nav>
 
+        {/* Dashboard switcher */}
+        <button
+          onClick={() => window.location.href = "/dashboard"}
+          className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-base text-white/50 hover:text-white/60 hover:bg-white/5 transition-all"
+        >
+          <span className="text-base">⟳</span> Switch dashboard
+        </button>
+
         <button
           onClick={() => {
             fetch("/api/auth/logout", { method: "POST", credentials: "include" }).then(() => {
               window.location.href = "/login";
             });
           }}
-          className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white/30 hover:text-white/60 hover:bg-white/5 transition-all"
+          className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-base text-white/50 hover:text-white/60 hover:bg-white/5 transition-all"
         >
           <span className="text-base">🚪</span> Logout
         </button>
@@ -122,7 +135,7 @@ export default function RenterLayout({ user }) {
                 key={item.id}
                 onClick={() => navigate(item.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all ${
-                  activeTab === item.id ? "bg-white/8 text-white font-medium" : "text-white/40"
+                  activeTab === item.id ? "bg-white/8 text-white font-medium" : "text-white/60"
                 }`}
               >
                 <span className="text-lg">{item.icon}</span>
@@ -147,7 +160,7 @@ export default function RenterLayout({ user }) {
             key={item.id}
             onClick={() => navigate(item.id)}
             className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-xs transition-all ${
-              activeTab === item.id ? "text-white" : "text-white/30"
+              activeTab === item.id ? "text-white" : "text-white/50"
             }`}
           >
             <span className="text-base">{item.icon}</span>

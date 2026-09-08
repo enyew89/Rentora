@@ -2,9 +2,7 @@ console.log("passport.js loaded");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const User = require("../models/User.js");
-const Invitation = require("../models/Invitation.js");
 const sendEmail = require("../config/nodemailer.js");
-const findOrCreate = require("mongoose-findorcreate");
 
 passport.use(User.createStrategy());
 console.log("About to register Google strategy");
@@ -34,27 +32,10 @@ passport.use(
           return cb(null, user);
         }
 
-        const pendingInvitation = await Invitation.findOne({
-          email,
-          status: "pending",
-        }).sort({ createdAt: -1 });
-
-        if (pendingInvitation) {
-          if (pendingInvitation.expiresAt < new Date()) {
-            pendingInvitation.status = "expired";
-            await pendingInvitation.save();
-          } else {
-            return cb(null, false, {
-              invitationToken: pendingInvitation.token,
-              message: "Please finish renter registration from your invitation link.",
-            });
-          }
-        }
-
+        // No existing user — create a new account
         user = await User.create({
           username: email,
           googleId: profile.id,
-          role: "landlord",
         });
 
         await sendEmail(

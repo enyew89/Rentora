@@ -1,288 +1,205 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Lock, LogOut, User, Shield, Eye, EyeOff } from "lucide-react";
+import {
+  GlassCard,
+  PageHeader,
+  Input,
+  PrimaryButton,
+  GhostButton,
+} from "../../components/ui";
 
 export default function Settings() {
-  const navigate = useNavigate();
-
   const [hasPassword, setHasPassword] = useState(false);
   const [user, setUser] = useState(null);
+  const [form, setForm] = useState({ firstName: "", lastName: "", phoneNumber: "" });
+  const [pwForm, setPwForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
+  const [editing, setEditing] = useState(false);
+  const [changingPw, setChangingPw] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [savingPw, setSavingPw] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [pwMsg, setPwMsg] = useState("");
+  const [error, setError] = useState("");
+  const [pwError, setPwError] = useState("");
 
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [passwordMessage, setPasswordMessage] = useState({ text: "", type: "" });
-
-  // Fetch user on mount to check if they have a local password
   useEffect(() => {
     fetch("/api/auth/me", { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
-        console.log("Fetched user data:", data);
         setUser(data.user);
-        console.log(data.hash);
         setHasPassword(data.hash);
+        setForm({
+          firstName: data.user?.firstName ?? "",
+          lastName: data.user?.lastName ?? "",
+          phoneNumber: data.user?.phoneNumber ?? "",
+        });
       })
       .catch(console.error);
   }, []);
 
-  const handleChange = (e) => {
-    setPasswordData({
-      ...passwordData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  function setField(field) {
+    return (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
+  }
 
-  const handleChangePassword = async (e) => {
+  function setPwField(field) {
+    return (e) => setPwForm((prev) => ({ ...prev, [field]: e.target.value }));
+  }
+
+  async function handleSaveProfile(e) {
     e.preventDefault();
-    setPasswordMessage({ text: "", type: "" });
-
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setPasswordMessage({ text: "New passwords do not match.", type: "error" });
-      return;
+    setSaving(true);
+    setError("");
+    setMsg("");
+    try {
+      const res = await fetch("/api/auth/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          firstName: form.firstName.trim(),
+          lastName: form.lastName.trim(),
+          phoneNumber: form.phoneNumber.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to update profile.");
+      setMsg("Profile updated.");
+      setEditing(false);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
     }
+  }
 
-    setIsChangingPassword(true);
-
+  async function handleChangePassword(e) {
+    e.preventDefault();
+    setPwError("");
+    setPwMsg("");
+    if (pwForm.newPassword.length < 8) return setPwError("Password must be at least 8 characters.");
+    if (pwForm.newPassword !== pwForm.confirmPassword) return setPwError("Passwords don't match.");
+    setSavingPw(true);
     try {
       const body = hasPassword
-        ? { currentPassword: passwordData.currentPassword, newPassword: passwordData.newPassword }
-        : { newPassword: passwordData.newPassword };
-
-      const response = await fetch("/api/auth/change-password", {
+        ? { currentPassword: pwForm.currentPassword, newPassword: pwForm.newPassword }
+        : { newPassword: pwForm.newPassword };
+      const res = await fetch("/api/auth/change-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(body),
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setPasswordMessage({ text: data.message || "Failed to change password.", type: "error" });
-        return;
-      }
-
-      setPasswordMessage({ text: data.message || "Password changed successfully.", type: "success" });
-      setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
-
-      // They now have a password, so show the current password field going forward
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to change password.");
+      setPwMsg("Password changed successfully.");
+      setChangingPw(false);
+      setPwForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
       setHasPassword(true);
-
-    } catch (error) {
-      console.error(error);
-      setPasswordMessage({ text: "Something went wrong.", type: "error" });
+    } catch (err) {
+      setPwError(err.message);
     } finally {
-      setIsChangingPassword(false);
+      setSavingPw(false);
     }
-  };
+  }
 
-  const handleLogout = async () => {
+  async function handleLogout() {
     try {
-      await fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-
-      navigate("/login");
-    } catch (error) {
-      console.error("Logout error:", error);
+      await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+      window.location.href = "/login";
+    } catch (err) {
+      console.error("Logout error:", err);
     }
-  };
+  }
+
+  const email = user?.email || "\u2014";
 
   return (
-    <div className="min-h-screen bg-transparent text-white p-6 md:p-10">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-3xl font-bold">Settings</h1>
-          <p className="text-gray-400 mt-2">
-            Manage your account and security settings.
-          </p>
+    <div className="space-y-6 max-w-lg">
+      <PageHeader title="Profile" subtitle="Manage your account details." />
+
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-base font-semibold text-white">My Profile</p>
+          {!editing && (
+            <button onClick={() => { setEditing(true); setMsg(""); setError(""); }}
+              className="text-sm text-blue-400 hover:text-blue-300 transition-colors">Edit</button>
+          )}
         </div>
+        {msg && <div className="mb-3 p-3 rounded-lg border border-emerald-500/25 bg-emerald-500/10 text-base text-emerald-400">{msg}</div>}
+        {error && <div className="mb-3 p-3 rounded-lg border border-red-500/25 bg-red-500/10 text-base text-red-400">{error}</div>}
 
-        {/* Account Section */}
-        <div className="bg-gray-900/60 border border-gray-800 rounded-2xl p-6 mb-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-3 bg-gray-800 rounded-xl">
-              <User size={22} />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold">Account</h2>
-              <p className="text-sm text-gray-400">Your account information</p>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm text-gray-400">Email</label>
-              <input
-                type="email"
-                disabled
-                value={user?.email || "user@example.com"}
-                className="w-full mt-2 px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-gray-400"
-              />
-            </div>
-            <div>
-              <label className="text-sm text-gray-400">Account Type</label>
-              <input
-                type="text"
-                disabled
-                value={user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : "Landlord"}
-                className="w-full mt-2 px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-gray-400"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Change Password */}
-        <div className="bg-gray-900/60 border border-gray-800 rounded-2xl p-6 mb-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-3 bg-gray-800 rounded-xl">
-              <Lock size={22} />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold">
-                {hasPassword ? "Change Password" : "Set a Password"}
-              </h2>
-              <p className="text-sm text-gray-400">
-                {hasPassword
-                  ? "Keep your account secure by using a strong password."
-                  : "You signed up with Google. You can set a password to also log in with email."}
-              </p>
-            </div>
-          </div>
-
-          <form onSubmit={handleChangePassword} className="space-y-5">
-
-            {/* Current Password — only for users who already have one */}
-            {hasPassword && (
+        <GlassCard className="p-5">
+          {editing ? (
+            <form onSubmit={handleSaveProfile} className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <Input label="First name" id="firstName" value={form.firstName} onChange={setField("firstName")} />
+                <Input label="Last name" id="lastName" value={form.lastName} onChange={setField("lastName")} />
+              </div>
+              <Input label="Phone number" id="phoneNumber" type="tel" value={form.phoneNumber} onChange={setField("phoneNumber")} />
               <div>
-                <label className="text-sm text-gray-300">Current Password</label>
-                <div className="relative mt-2">
-                  <input
-                    type={showCurrentPassword ? "text" : "password"}
-                    name="currentPassword"
-                    value={passwordData.currentPassword}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 pr-12 bg-gray-800 border border-gray-700 rounded-xl focus:outline-none focus:border-neutral-400"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
-                  >
-                    {showCurrentPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
+                <p className="text-sm text-white/50 mb-2 font-medium">Email</p>
+                <p className="text-base text-white/70">{email}</p>
+              </div>
+              <div className="flex gap-3 pt-1">
+                <GhostButton type="button" onClick={() => setEditing(false)}>Cancel</GhostButton>
+                <PrimaryButton type="submit" className="flex-1" disabled={saving}>{saving ? "Saving..." : "Save changes"}</PrimaryButton>
+              </div>
+            </form>
+          ) : (
+            <div>
+              {[["First name", form.firstName || "\u2014"], ["Last name", form.lastName || "\u2014"], ["Email", email], ["Phone", form.phoneNumber || "\u2014"]].map(([label, value]) => (
+                <div key={label} className="flex justify-between items-center py-2.5 border-b border-white/5 last:border-0">
+                  <span className="text-base text-white/50">{label}</span>
+                  <span className="text-base text-white font-medium">{value}</span>
                 </div>
-              </div>
-            )}
-
-            {/* New Password */}
-            <div>
-              <label className="text-sm text-gray-300">New Password</label>
-              <div className="relative mt-2">
-                <input
-                  type={showNewPassword ? "text" : "password"}
-                  name="newPassword"
-                  value={passwordData.newPassword}
-                  onChange={handleChange}
-                  required
-                  minLength={8}
-                  className="w-full px-4 py-3 pr-12 bg-gray-800 border border-gray-700 rounded-xl focus:outline-none focus:border-neutral-400"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowNewPassword(!showNewPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
-                >
-                  {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
+              ))}
             </div>
+          )}
+        </GlassCard>
+      </div>
 
-            {/* Confirm Password */}
-            <div>
-              <label className="text-sm text-gray-300">Confirm New Password</label>
-              <div className="relative mt-2">
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  name="confirmPassword"
-                  value={passwordData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                  minLength={8}
-                  className="w-full px-4 py-3 pr-12 bg-gray-800 border border-gray-700 rounded-xl focus:outline-none focus:border-neutral-400"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
-                >
-                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-            </div>
-
-            {/* Feedback */}
-            {passwordMessage.text && (
-              <p className={`text-sm ${passwordMessage.type === "error" ? "text-red-400" : "text-neutral-300"}`}>
-                {passwordMessage.text}
-              </p>
-            )}
-
-            <button
-              type="submit"
-              disabled={isChangingPassword}
-              className="px-6 py-3 bg-neutral-400 hover:bg-neutral-500 rounded-xl font-semibold transition disabled:opacity-50"
-            >
-              {isChangingPassword ? "Saving..." : hasPassword ? "Change Password" : "Set Password"}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-base font-semibold text-white">Security</p>
+          {!changingPw && (
+            <button onClick={() => { setChangingPw(true); setPwMsg(""); setPwError(""); }}
+              className="text-sm text-blue-400 hover:text-blue-300 transition-colors">
+              {hasPassword ? "Change password" : "Set password"}
             </button>
-          </form>
+          )}
         </div>
+        {pwMsg && <div className="mb-3 p-3 rounded-lg border border-emerald-500/25 bg-emerald-500/10 text-base text-emerald-400">{pwMsg}</div>}
+        {pwError && <div className="mb-3 p-3 rounded-lg border border-red-500/25 bg-red-500/10 text-base text-red-400">{pwError}</div>}
 
-        {/* Security */}
-        <div className="bg-gray-900/60 border border-gray-800 rounded-2xl p-6 mb-6">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-gray-800 rounded-xl">
-              <Shield size={22} />
+        <GlassCard className="p-5">
+          {changingPw ? (
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              {hasPassword && <Input label="Current password" id="currentPassword" type="password" value={pwForm.currentPassword} onChange={setPwField("currentPassword")} />}
+              <Input label="New password" id="newPassword" type="password" placeholder="At least 8 characters" value={pwForm.newPassword} onChange={setPwField("newPassword")} />
+              <Input label="Confirm new password" id="confirmPassword" type="password" value={pwForm.confirmPassword} onChange={setPwField("confirmPassword")} />
+              <div className="flex gap-3 pt-1">
+                <GhostButton type="button" onClick={() => setChangingPw(false)}>Cancel</GhostButton>
+                <PrimaryButton type="submit" className="flex-1" disabled={savingPw}>{savingPw ? "Saving..." : hasPassword ? "Update password" : "Set password"}</PrimaryButton>
+              </div>
+            </form>
+          ) : (
+            <div className="flex justify-between items-center">
+              <span className="text-base text-white/50">Password</span>
+              <span className="text-base text-white/50 tracking-widest">\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022</span>
             </div>
-            <div>
-              <h2 className="text-xl font-semibold">Security</h2>
-              <p className="text-sm text-gray-400">
-                Your account is protected with secure authentication.
-              </p>
-            </div>
-          </div>
-        </div>
+          )}
+        </GlassCard>
+      </div>
 
-        {/* Logout */}
-        <div className="bg-gray-900/60 border border-neutral-700/40 rounded-2xl p-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
+      <div>
+        <GlassCard className="p-5" accent="red">
+          <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold">Log out</h2>
-              <p className="text-sm text-gray-400 mt-1">
-                Log out of your Rentora account on this device.
-              </p>
+              <p className="text-base font-semibold text-white">Log out</p>
+              <p className="text-sm text-white/50 mt-1">Sign out of your Rentora account.</p>
             </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-neutral-500 hover:bg-neutral-600 rounded-xl font-semibold transition"
-            >
-              <LogOut size={18} />
-              Log Out
-            </button>
+            <PrimaryButton onClick={handleLogout} className="bg-red-500/90 hover:bg-red-500 text-white">Log out</PrimaryButton>
           </div>
-        </div>
+        </GlassCard>
       </div>
     </div>
   );

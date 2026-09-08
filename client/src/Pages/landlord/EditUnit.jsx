@@ -159,7 +159,7 @@ export default function EditUnit({ navigate, params }) {
     Number(form.rentAmount) > 0;
 
   if (loadingUnit) {
-    return <div className="text-sm text-white/40">Loading unit...</div>;
+    return <div className="text-base text-white/60">Loading unit...</div>;
   }
 
   return (

@@ -70,13 +70,6 @@ exports.createPayment = async (req, res) => {
 
     if (!lease) return res.status(404).json({ message: "Lease not found." });
 
-    // Only landlords can use this manual endpoint
-    if (req.user.role !== "landlord") {
-      return res
-        .status(403)
-        .json({ message: "Renters must use the online payment flow." });
-    }
-
     if (lease.unit.property.landlord.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: "Forbidden." });
     }

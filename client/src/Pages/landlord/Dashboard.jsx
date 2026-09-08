@@ -108,10 +108,10 @@ export default function Dashboard({ navigate }) {
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
   const stats = [
-    { label: "Properties",  value: String(properties.length) },
-    { label: "Total units", value: String(totalUnits) },
-    { label: "Occupied",    value: String(occupied), sub: `of ${totalUnits} units`, color: "text-neutral-300" },
-    { label: "Vacant",      value: String(vacant),   sub: "available now",          color: "text-neutral-400"  },
+    { label: "Properties",  value: String(properties.length), color: "text-blue-400" },
+    { label: "Total units", value: String(totalUnits), color: "text-white" },
+    { label: "Occupied",    value: String(occupied), sub: `of ${totalUnits} units`, color: "text-emerald-400" },
+    { label: "Vacant",      value: String(vacant),   sub: "available now",          color: "text-sky-400"  },
   ];
 
   return (
@@ -119,7 +119,7 @@ export default function Dashboard({ navigate }) {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-medium text-white">{greeting} 👋</h1>
-        <p className="text-sm text-white/40 mt-1">Here's an overview of your properties.</p>
+        <p className="text-base text-white/60 mt-1">Here's an overview of your properties.</p>
       </div>
 
       {/* Stat cards */}
@@ -130,33 +130,33 @@ export default function Dashboard({ navigate }) {
       {/* Occupancy bar */}
       <GlassCard className="p-4">
         <div className="flex justify-between items-center mb-3">
-          <span className="text-sm font-medium text-white/80">Occupancy rate</span>
-          <span className="text-sm text-white/40">{occupancyPct}%</span>
+          <span className="text-base font-semibold text-white">Occupancy rate</span>
+          <span className="text-base text-white/60">{occupancyPct}%</span>
         </div>
         <div className="h-2 bg-white/5 rounded-full overflow-hidden">
           <div
-            className="h-full bg-neutral-400 rounded-full transition-all duration-700"
+            className="h-full bg-blue-500 rounded-full transition-all duration-700"
             style={{ width: `${occupancyPct}%` }}
           />
         </div>
         <div className="flex justify-between mt-2">
-          <span className="text-xs text-white/30">{occupied} occupied</span>
-          <span className="text-xs text-white/30">{vacant} vacant</span>
+          <span className="text-sm text-white/50">{occupied} occupied</span>
+          <span className="text-sm text-white/50">{vacant} vacant</span>
         </div>
       </GlassCard>
 
       {/* Finance cards */}
       <div className="grid grid-cols-2 gap-3">
         <GlassCard className="p-4 border-white/20">
-          <p className="text-xs text-white/40 mb-2">Rent collected</p>
+          <p className="text-sm text-white/50 mb-2">Rent collected</p>
           <p className="text-xl font-medium text-neutral-300">
-            {collected.toLocaleString()} <span className="text-sm font-normal text-white/30">ETB</span>
+            {collected.toLocaleString()} <span className="text-sm font-normal text-white/50">ETB</span>
           </p>
         </GlassCard>
         <GlassCard className="p-4 border-neutral-500/20">
-          <p className="text-xs text-white/40 mb-2">Pending rent</p>
+          <p className="text-sm text-white/50 mb-2">Pending rent</p>
           <p className="text-xl font-medium text-neutral-400">
-            {pending.toLocaleString()} <span className="text-sm font-normal text-white/30">ETB</span>
+            {pending.toLocaleString()} <span className="text-sm font-normal text-white/50">ETB</span>
           </p>
         </GlassCard>
       </div>
@@ -164,17 +164,17 @@ export default function Dashboard({ navigate }) {
       {/* Recent Payments */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <p className="text-sm font-medium text-white/60">Recent payments</p>
+          <p className="text-base font-semibold text-white">Recent payments</p>
           <button
             onClick={() => navigate("payments")}
-            className="text-xs text-neutral-400 hover:text-neutral-300 transition-colors"
+            className="text-sm text-neutral-300 hover:text-neutral-300 transition-colors"
           >
             View all →
           </button>
         </div>
 
         {recentPayments.length === 0 ? (
-          <GlassCard className="p-6 text-center text-sm text-white/30">
+          <GlassCard className="p-6 text-center text-base text-white/50">
             No payments recorded yet.
           </GlassCard>
         ) : (
@@ -192,14 +192,14 @@ export default function Dashboard({ navigate }) {
                     <Avatar initials={initials(p)} size="sm" />
                     <div>
                       <p className="text-sm font-medium text-white">{renterName}</p>
-                      <p className="text-xs text-white/40">{unitLabel} · {monthLabel}</p>
+                      <p className="text-sm text-white/50">{unitLabel} · {monthLabel}</p>
                     </div>
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-medium text-neutral-300">
                       +{p.amount.toLocaleString()} ETB
                     </p>
-                    <p className="text-xs text-white/30">
+                    <p className="text-sm text-white/50">
                       {p.paymentDate
                         ? new Date(p.paymentDate).toLocaleDateString("en-US", {
                             month: "short", day: "numeric",
@@ -217,17 +217,17 @@ export default function Dashboard({ navigate }) {
       {/* Recent Maintenance */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <p className="text-sm font-medium text-white/60">Recent maintenance</p>
+          <p className="text-base font-semibold text-white">Recent maintenance</p>
           <button
             onClick={() => navigate("maintenance")}
-            className="text-xs text-neutral-400 hover:text-neutral-300 transition-colors"
+            className="text-sm text-neutral-300 hover:text-neutral-300 transition-colors"
           >
             View all →
           </button>
         </div>
 
         {recentMaintenance.length === 0 ? (
-          <GlassCard className="p-6 text-center text-sm text-white/30">
+          <GlassCard className="p-6 text-center text-base text-white/50">
             No maintenance requests yet.
           </GlassCard>
         ) : (
@@ -236,12 +236,12 @@ export default function Dashboard({ navigate }) {
               <div key={m._id} className="flex items-center justify-between px-4 py-3">
                 <div>
                   <p className="text-sm font-medium text-white">{m.title}</p>
-                  <p className="text-xs text-white/40">
+                  <p className="text-sm text-white/50">
                     {m.unit?.unitNumber ? `Unit ${m.unit.unitNumber}` : "—"}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-white/30">
+                  <span className="text-sm text-white/50">
                     {new Date(m.createdAt).toLocaleDateString()}
                   </span>
                   <Badge status={m.status} />

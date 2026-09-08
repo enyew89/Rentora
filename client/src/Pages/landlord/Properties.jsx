@@ -52,12 +52,12 @@ function PropertyCard({ property, totalUnits, occupiedUnits, onClick }) {
             {property.name}
           </h3>
 
-          <p className="text-sm text-white/40 mt-0.5">
+          <p className="text-base text-white/60 mt-0.5">
             {property.address || "No address provided"}
           </p>
         </div>
 
-        <span className="text-xs text-white/30 bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">
+        <span className="text-sm text-white/50 bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">
           {property.type || "Property"}
         </span>
       </div>
@@ -78,20 +78,20 @@ function PropertyCard({ property, totalUnits, occupiedUnits, onClick }) {
             {totalUnits} units
           </span>
 
-          <span className="text-white/20">·</span>
+          <span className="text-white/40">·</span>
 
           <span className="text-neutral-300">
             {occupiedUnits} occupied
           </span>
 
-          <span className="text-white/20">·</span>
+          <span className="text-white/40">·</span>
 
           <span className="text-neutral-400">
             {vacantUnits} vacant
           </span>
         </div>
 
-        <span className="text-xs text-neutral-400 group-hover:translate-x-0.5 transition-transform">
+        <span className="text-sm text-neutral-300 group-hover:translate-x-0.5 transition-transform">
           View →
         </span>
       </div>
@@ -144,7 +144,7 @@ export default function Properties({ navigate }) {
       {/* Loading */}
       {loading && (
         <GlassCard className="p-8 text-center">
-          <p className="text-sm text-white/40">
+          <p className="text-base text-white/60">
             Loading your properties...
           </p>
         </GlassCard>

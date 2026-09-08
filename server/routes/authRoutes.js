@@ -1,15 +1,9 @@
 const router = require("express").Router();
 const passport = require("passport");
 const authControllers = require("../controllers/authControllers.js");
-const ensureAuthenticated = require("../middlewares/auth.js");
-const { isAuthenticated, isLandlord, isRenter} = require("../middlewares/auth.js");
+const { isAuthenticated } = require("../middlewares/auth.js");
 
 const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
-
-function dashboardPathFor(user) {
-  if (user?.role === "renter") return "/renter/dashboard";
-  return "/landlord/dashboard";
-}
 
 router.post("/api/auth/register", authControllers.register);
 router.post("/api/auth/login", authControllers.login);
@@ -43,32 +37,27 @@ router.get(
     passport.authenticate("google", (err, user, info) => {
       if (err) {
         console.error("Google auth callback error:", err);
-        return res.redirect(`${clientUrl}/login`);
+        return res.redirect(clientUrl + "/login");
       }
 
       if (!user) {
-        if (info?.invitationToken) {
-          return res.redirect(`${clientUrl}/accept-invite/${info.invitationToken}`);
-        }
-
-        return res.redirect(`${clientUrl}/login`);
+        return res.redirect(clientUrl + "/login");
       }
 
       req.login(user, (loginErr) => {
         if (loginErr) {
           console.error("Google login error:", loginErr);
-          return res.redirect(`${clientUrl}/login`);
+          return res.redirect(clientUrl + "/login");
         }
 
         if (!user.profileComplete) {
-          return res.redirect(`${clientUrl}/complete-profile`);
+          return res.redirect(clientUrl + "/complete-profile");
         }
 
-        return res.redirect(`${clientUrl}${dashboardPathFor(user)}`);
+        return res.redirect(clientUrl + "/dashboard");
       });
     })(req, res);
   },
 );
-
 
 module.exports = router;

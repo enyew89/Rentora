@@ -79,7 +79,7 @@ export default function RenterPayments() {
     }
   }
 
-  if (loading) return <div className="text-sm text-white/40">Loading...</div>;
+  if (loading) return <div className="text-base text-white/60">Loading...</div>;
 
   return (
     <div className="space-y-5 max-w-lg">
@@ -96,14 +96,14 @@ export default function RenterPayments() {
         <GlassCard className="p-5">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <p className="text-xs text-white/40 mb-1">Monthly Rent</p>
+              <p className="text-sm text-white/50 mb-1">Monthly Rent</p>
               <p className="text-2xl font-semibold text-white">
                 {Number(nextPayment?.amount ?? lease.monthlyRent).toLocaleString()} ETB
               </p>
               {nextDueDateLabel ? (
-                <p className="text-xs text-white/30 mt-1">Due {nextDueDateLabel}</p>
+                <p className="text-sm text-white/50 mt-1">Due {nextDueDateLabel}</p>
               ) : (
-                <p className="text-xs text-neutral-300/70 mt-1">No payment due</p>
+                <p className="text-sm text-neutral-200/70 mt-1">No payment due</p>
               )}
             </div>
             <span
@@ -131,17 +131,17 @@ export default function RenterPayments() {
         </GlassCard>
       ) : (
         <GlassCard className="p-5 text-center">
-          <p className="text-sm text-white/40">No active lease found.</p>
+          <p className="text-base text-white/60">No active lease found.</p>
         </GlassCard>
       )}
 
       {/* Payment history — only shows current month and earlier */}
       <div>
-        <p className="text-sm font-medium text-white/60 mb-3">Payment History</p>
+        <p className="text-base font-semibold text-white/80 mb-3">Payment History</p>
 
         {visiblePayments.length === 0 ? (
           <GlassCard className="p-5 text-center">
-            <p className="text-sm text-white/30">No payments recorded yet.</p>
+            <p className="text-base text-white/50">No payments recorded yet.</p>
           </GlassCard>
         ) : (
           <div className="space-y-2">
@@ -155,8 +155,8 @@ export default function RenterPayments() {
               return (
                 <GlassCard key={p._id} className="p-4 flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-white font-medium">{label}</p>
-                    <p className="text-xs text-white/30 mt-0.5">
+                    <p className="text-base text-white font-medium">{label}</p>
+                    <p className="text-sm text-white/50 mt-0.5">
                       {Number(p.amount ?? lease?.monthlyRent).toLocaleString()} ETB
                     </p>
                   </div>

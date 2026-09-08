@@ -16,11 +16,6 @@ const userSchema = new mongoose.Schema(
     phoneNumber: {
       type: String,
     },
-    role: {
-      type: String,
-      enum: ["landlord", "admin", "renter", "applicant"],
-      default: "landlord",
-    },
     profileComplete: {
       type: Boolean,
       default: false,
