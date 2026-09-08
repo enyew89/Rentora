@@ -2,6 +2,7 @@ console.log("passport.js loaded");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const User = require("../models/User.js");
+const Invitation = require("../models/Invitation.js");
 const sendEmail = require("../config/nodemailer.js");
 const findOrCreate = require("mongoose-findorcreate");
 
@@ -16,13 +17,15 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, cb) => {
       try {
-        const email = profile.emails[0].value;
+        const email = profile.emails?.[0]?.value?.trim().toLowerCase();
+
+        if (!email) {
+          return cb(null, false, { message: "Google account email is required." });
+        }
 
         let user = await User.findOne({ username: email });
 
         if (user) {
-          // User already exists
-
           if (!user.googleId) {
             user.googleId = profile.id;
             await user.save();
@@ -31,7 +34,23 @@ passport.use(
           return cb(null, user);
         }
 
-        // User doesn't exist, create a new one
+        const pendingInvitation = await Invitation.findOne({
+          email,
+          status: "pending",
+        }).sort({ createdAt: -1 });
+
+        if (pendingInvitation) {
+          if (pendingInvitation.expiresAt < new Date()) {
+            pendingInvitation.status = "expired";
+            await pendingInvitation.save();
+          } else {
+            return cb(null, false, {
+              invitationToken: pendingInvitation.token,
+              message: "Please finish renter registration from your invitation link.",
+            });
+          }
+        }
+
         user = await User.create({
           username: email,
           googleId: profile.id,

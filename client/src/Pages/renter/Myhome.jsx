@@ -86,7 +86,7 @@ export default function MyHome() {
           <Row
             label="Status"
             value={
-              <span className="text-emerald-400 font-medium capitalize">
+              <span className="text-neutral-300 font-medium capitalize">
                 {lease.status ?? "Active"}
               </span>
             }

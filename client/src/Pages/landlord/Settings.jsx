@@ -99,7 +99,7 @@ export default function Settings() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white p-6 md:p-10">
+    <div className="min-h-screen bg-transparent text-white p-6 md:p-10">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-10">
@@ -174,7 +174,7 @@ export default function Settings() {
                     value={passwordData.currentPassword}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 pr-12 bg-gray-800 border border-gray-700 rounded-xl focus:outline-none focus:border-orange-500"
+                    className="w-full px-4 py-3 pr-12 bg-gray-800 border border-gray-700 rounded-xl focus:outline-none focus:border-neutral-400"
                   />
                   <button
                     type="button"
@@ -198,7 +198,7 @@ export default function Settings() {
                   onChange={handleChange}
                   required
                   minLength={8}
-                  className="w-full px-4 py-3 pr-12 bg-gray-800 border border-gray-700 rounded-xl focus:outline-none focus:border-orange-500"
+                  className="w-full px-4 py-3 pr-12 bg-gray-800 border border-gray-700 rounded-xl focus:outline-none focus:border-neutral-400"
                 />
                 <button
                   type="button"
@@ -221,7 +221,7 @@ export default function Settings() {
                   onChange={handleChange}
                   required
                   minLength={8}
-                  className="w-full px-4 py-3 pr-12 bg-gray-800 border border-gray-700 rounded-xl focus:outline-none focus:border-orange-500"
+                  className="w-full px-4 py-3 pr-12 bg-gray-800 border border-gray-700 rounded-xl focus:outline-none focus:border-neutral-400"
                 />
                 <button
                   type="button"
@@ -235,7 +235,7 @@ export default function Settings() {
 
             {/* Feedback */}
             {passwordMessage.text && (
-              <p className={`text-sm ${passwordMessage.type === "error" ? "text-red-400" : "text-green-400"}`}>
+              <p className={`text-sm ${passwordMessage.type === "error" ? "text-red-400" : "text-neutral-300"}`}>
                 {passwordMessage.text}
               </p>
             )}
@@ -243,7 +243,7 @@ export default function Settings() {
             <button
               type="submit"
               disabled={isChangingPassword}
-              className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-xl font-semibold transition disabled:opacity-50"
+              className="px-6 py-3 bg-neutral-400 hover:bg-neutral-500 rounded-xl font-semibold transition disabled:opacity-50"
             >
               {isChangingPassword ? "Saving..." : hasPassword ? "Change Password" : "Set Password"}
             </button>
@@ -266,7 +266,7 @@ export default function Settings() {
         </div>
 
         {/* Logout */}
-        <div className="bg-gray-900/60 border border-red-900/40 rounded-2xl p-6">
+        <div className="bg-gray-900/60 border border-neutral-700/40 rounded-2xl p-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
             <div>
               <h2 className="text-xl font-semibold">Log out</h2>
@@ -276,7 +276,7 @@ export default function Settings() {
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 rounded-xl font-semibold transition"
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-neutral-500 hover:bg-neutral-600 rounded-xl font-semibold transition"
             >
               <LogOut size={18} />
               Log Out

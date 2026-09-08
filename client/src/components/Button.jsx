@@ -8,7 +8,7 @@ export default function Button({
   const baseClasses = 'w-full py-2.5 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2';
 
   const variants = {
-    primary: `${baseClasses} bg-gradient-to-r from-red-600 to-orange-500 text-white hover:shadow-lg hover:shadow-orange-500/20 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none disabled:hover:translate-y-0`,
+    primary: `${baseClasses} bg-gradient-to-r from-neutral-700 to-neutral-500 text-white hover:shadow-lg hover:shadow-white-500/20 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none disabled:hover:translate-y-0`,
     secondary: `${baseClasses} bg-white text-gray-900 hover:shadow-lg hover:shadow-white/10 hover:-translate-y-0.5 font-semibold`,
   };
 

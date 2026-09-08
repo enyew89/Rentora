@@ -67,8 +67,8 @@ export default function Maintenance() {
           <h1 className="text-xl font-medium text-white">Maintenance</h1>
           <p className="text-sm text-white/40 mt-1">Track and manage repair requests.</p>
         </div>
-        <GlassCard className="p-6 text-center border-red-500/20">
-          <p className="text-red-400 text-sm">Failed to load maintenance requests.</p>
+        <GlassCard className="p-6 text-center border-neutral-500/20">
+          <p className="text-neutral-400 text-sm">Failed to load maintenance requests.</p>
           <button
             onClick={() => window.location.reload()}
             className="text-xs text-white/40 hover:text-white mt-2 transition-colors"
@@ -90,16 +90,16 @@ export default function Maintenance() {
 
       {/* Status summary */}
       <div className="grid grid-cols-3 gap-3">
-        <GlassCard className="p-4 text-center border-red-500/20">
-          <p className="text-2xl font-medium text-red-400">{counts["Open"]}</p>
+        <GlassCard className="p-4 text-center border-neutral-500/20">
+          <p className="text-2xl font-medium text-neutral-400">{counts["Open"]}</p>
           <p className="text-xs text-white/40 mt-1">Open</p>
         </GlassCard>
-        <GlassCard className="p-4 text-center border-blue-500/20">
-          <p className="text-2xl font-medium text-blue-400">{counts["In progress"]}</p>
+        <GlassCard className="p-4 text-center border-neutral-500/20">
+          <p className="text-2xl font-medium text-neutral-400">{counts["In progress"]}</p>
           <p className="text-xs text-white/40 mt-1">In progress</p>
         </GlassCard>
-        <GlassCard className="p-4 text-center border-emerald-500/20">
-          <p className="text-2xl font-medium text-emerald-400">{counts["Done"]}</p>
+        <GlassCard className="p-4 text-center border-white/20">
+          <p className="text-2xl font-medium text-neutral-300">{counts["Done"]}</p>
           <p className="text-xs text-white/40 mt-1">Done</p>
         </GlassCard>
       </div>

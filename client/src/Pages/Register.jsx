@@ -55,11 +55,11 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-gray-100 overflow-hidden flex flex-col justify-center items-center px-4">
+    <div className="min-h-screen bg-transparent text-gray-100 overflow-hidden flex flex-col justify-center items-center px-4">
       {/* Animated background gradient */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-orange-600/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-red-600/5 rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/[0.03] rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/[0.03] rounded-full blur-3xl" />
       </div>
 
       {/* Main content */}
@@ -67,7 +67,7 @@ export default function Register() {
         {/* Logo and brand */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-red-600 to-orange-500 rounded-xl flex items-center justify-center font-bold text-lg text-white shadow-lg shadow-orange-500/20">
+            <div className="w-12 h-12 bg-gradient-to-br from-neutral-700 to-neutral-500 rounded-xl flex items-center justify-center font-bold text-lg text-white shadow-lg shadow-orange-500/20">
               R
             </div>
           </div>
@@ -78,7 +78,7 @@ export default function Register() {
         {/* Premium Card */}
         <div className="group relative">
           {/* Glow effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-red-600/20 to-orange-500/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           
           {/* Card */}
           <div className="relative bg-gray-900/60 backdrop-blur-2xl border border-gray-800/60 rounded-3xl p-8 shadow-2xl overflow-hidden">
@@ -155,16 +155,16 @@ export default function Register() {
                     <input
                       type="checkbox"
                       id="terms"
-                      className="w-5 h-5 mt-0.5 accent-orange-500 cursor-pointer rounded border-gray-700 bg-gray-800 transition-all hover:border-orange-500/50"
+                      className="w-5 h-5 mt-0.5 accent-neutral-400 cursor-pointer rounded border-gray-700 bg-gray-800 transition-all hover:border-orange-500/50"
                       {...register('agreeToTerms')}
                     />
                     <label htmlFor="terms" className="text-xs text-gray-400 cursor-pointer leading-relaxed">
                       I agree to the{' '}
-                      <a href="#" className="text-orange-500 hover:text-orange-400 transition-colors font-medium">
+                      <a href="#" className="text-neutral-400 hover:text-neutral-400 transition-colors font-medium">
                         Terms of Service
                       </a>
                       {' '}and{' '}
-                      <a href="#" className="text-orange-500 hover:text-orange-400 transition-colors font-medium">
+                      <a href="#" className="text-neutral-400 hover:text-neutral-400 transition-colors font-medium">
                         Privacy Policy
                       </a>
                     </label>
@@ -188,7 +188,7 @@ export default function Register() {
               {/* Login link */}
               <p className="text-center text-xs text-gray-500 pt-2">
                 Already have an account?{' '}
-                <Link to="/login" className="text-orange-500 hover:text-orange-400 font-semibold transition-colors">
+                <Link to="/login" className="text-neutral-400 hover:text-neutral-400 font-semibold transition-colors">
                   Log in
                 </Link>
               </p>

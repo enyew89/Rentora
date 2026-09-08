@@ -16,7 +16,10 @@ exports.getUnits = async (req, res) => {
     const owns = await landlordOwnsProperty(property, req.user._id);
     if (!owns) return res.status(403).json({ message: "Forbidden." });
 
-    const units = await Unit.find({ property });
+    const units = await Unit.find({ property }).populate(
+      "renter",
+      "firstName lastName username phoneNumber role"
+    );
     res.json(units);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -26,7 +29,9 @@ exports.getUnits = async (req, res) => {
 // GET /units/:id
 exports.getUnit = async (req, res) => {
   try {
-    const unit = await Unit.findById(req.params.id).populate("property");
+    const unit = await Unit.findById(req.params.id)
+      .populate("property")
+      .populate("renter", "firstName lastName username phoneNumber role");
     if (!unit) return res.status(404).json({ message: "Unit not found." });
 
     if (unit.property.landlord.toString() !== req.user._id.toString()) {

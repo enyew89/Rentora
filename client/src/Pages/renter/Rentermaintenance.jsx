@@ -4,16 +4,16 @@ import { GlassCard, PageHeader, PrimaryButton } from "../../components/ui";
 const STATUS_STYLES = {
   open: "text-yellow-400 bg-yellow-400/10",
   pending: "text-yellow-400 bg-yellow-400/10",
-  "in-progress": "text-blue-400 bg-blue-400/10",
-  completed: "text-emerald-400 bg-emerald-400/10",
+  "in-progress": "text-neutral-300 bg-neutral-400/10",
+  completed: "text-neutral-300 bg-white/10",
   closed: "text-white/30 bg-white/5",
 };
 
 const PRIORITY_STYLES = {
   low: "text-white/30",
   medium: "text-yellow-400",
-  high: "text-orange-400",
-  urgent: "text-red-400",
+  high: "text-neutral-400",
+  urgent: "text-neutral-400",
 };
 
 export default function RenterMaintenance({ navigate }) {
@@ -52,7 +52,7 @@ export default function RenterMaintenance({ navigate }) {
       </div>
 
       {error && (
-        <div className="p-3 rounded-lg border border-red-500/20 bg-red-500/10 text-sm text-red-400">
+        <div className="p-3 rounded-lg border border-neutral-500/20 bg-neutral-500/10 text-sm text-neutral-400">
           {error}
         </div>
       )}

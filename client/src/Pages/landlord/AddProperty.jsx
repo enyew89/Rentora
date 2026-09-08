@@ -147,8 +147,8 @@ export default function AddProperty({ navigate }) {
 
           {/* Error message */}
           {error && (
-            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-              <p className="text-sm text-red-400">
+            <div className="p-3 rounded-lg bg-neutral-500/10 border border-neutral-500/20">
+              <p className="text-sm text-neutral-400">
                 {error}
               </p>
             </div>

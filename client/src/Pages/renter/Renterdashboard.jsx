@@ -19,8 +19,8 @@ function greeting(firstName) {
 
 const STATUS_COLORS = {
   pending: "text-yellow-400 bg-yellow-400/10",
-  "in-progress": "text-blue-400 bg-blue-400/10",
-  completed: "text-emerald-400 bg-emerald-400/10",
+  "in-progress": "text-neutral-300 bg-neutral-400/10",
+  completed: "text-neutral-300 bg-white/10",
   open: "text-yellow-400 bg-yellow-400/10",
 };
 
@@ -76,7 +76,7 @@ export default function RenterDashboard({ navigate, user }) {
       </div>
 
       {error && (
-        <div className="p-3 rounded-lg border border-red-500/20 bg-red-500/10 text-sm text-red-400">
+        <div className="p-3 rounded-lg border border-neutral-500/20 bg-neutral-500/10 text-sm text-neutral-400">
           {error}
         </div>
       )}
@@ -92,7 +92,7 @@ export default function RenterDashboard({ navigate, user }) {
             {property?.name ?? "—"} · Unit {unit?.unitNumber ?? "—"}
           </p>
           <p className="text-sm text-white/40 mt-0.5">{property?.address ?? "—"}</p>
-          <p className="text-xs text-emerald-400 mt-3">View details →</p>
+          <p className="text-xs text-neutral-300 mt-3">View details →</p>
         </GlassCard>
       ) : (
         <GlassCard className="p-5 text-center">

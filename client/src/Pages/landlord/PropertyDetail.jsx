@@ -42,7 +42,7 @@ function UnitRow({ unit, onClick }) {
         </div>
 
         <div>
-          <p className="text-sm font-medium text-white group-hover:text-blue-300 transition-colors">
+          <p className="text-sm font-medium text-white group-hover:text-neutral-300 transition-colors">
             Unit {unit.unitNumber}
           </p>
 
@@ -61,7 +61,7 @@ function UnitRow({ unit, onClick }) {
 
         <Badge status={unit.status} />
 
-        <span className="text-xs text-white/20 group-hover:text-blue-400 transition-colors">
+        <span className="text-xs text-white/20 group-hover:text-neutral-400 transition-colors">
           →
         </span>
       </div>
@@ -129,7 +129,7 @@ export default function PropertyDetail({ navigate, params }) {
           label="Properties"
         />
 
-        <div className="text-red-400 text-sm">
+        <div className="text-neutral-400 text-sm">
           Failed to load property: {error}
         </div>
       </div>
@@ -229,7 +229,7 @@ export default function PropertyDetail({ navigate, params }) {
         </GlassCard>
 
         <GlassCard className="p-4 text-center">
-          <p className="text-2xl font-medium text-emerald-400">
+          <p className="text-2xl font-medium text-neutral-300">
             {occupied}
           </p>
 
@@ -239,7 +239,7 @@ export default function PropertyDetail({ navigate, params }) {
         </GlassCard>
 
         <GlassCard className="p-4 text-center">
-          <p className="text-2xl font-medium text-amber-400">
+          <p className="text-2xl font-medium text-neutral-400">
             {vacant}
           </p>
 
@@ -264,7 +264,7 @@ export default function PropertyDetail({ navigate, params }) {
 
           <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
             <div
-              className="h-full bg-blue-500 rounded-full transition-all"
+              className="h-full bg-neutral-400 rounded-full transition-all"
               style={{
                 width: `${occupancyPct}%`,
               }}

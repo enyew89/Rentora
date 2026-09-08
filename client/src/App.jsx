@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import Home from "./Pages/Home";
 import About from "./Pages/About";
@@ -7,18 +7,22 @@ import Contact from "./Pages/Contact";
 import Rentals from "./Pages/Rentals";
 import Login from "./Pages/Login";
 import Register from "./Pages/Register";
-
 import LandlordLayout from "./Pages/landlord/LandlordLayout";
 import CompleteProfile from "./Pages/Completeprofile";
 import AcceptInvite from "./Pages/AcceptInvites";
-import RenterLayout from "./Pages/renter/RenterLayout";
-
-
+import RenterLayout from "./Pages/renter/Renterlayout";
+import Unauthorized from "./Pages/Unauthorized";
 import ProtectedRoute from "./components/ProtectedRoute";
+import PaymentSuccess from "./Pages/renter/PaymentSuccess";
 
 function App() {
   const [user, setUser] = useState(null);
   const [authStatus, setAuthStatus] = useState("loading");
+
+  function handleAuthenticated(nextUser) {
+    setUser(nextUser);
+    setAuthStatus("authenticated");
+  }
 
   useEffect(() => {
     fetch("/api/auth/me", { credentials: "include" })
@@ -39,27 +43,20 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* =========================
-            PUBLIC ROUTES
-        ========================= */}
-
         <Route path="/" element={<Home />} />
-
         <Route path="/about" element={<About />} />
-
         <Route path="/contact" element={<Contact />} />
-
         <Route path="/rentals" element={<Rentals />} />
-
-        <Route path="/login" element={<Login />} />
-
-        <Route path="/register" element={<Register />} />
-
+        <Route
+          path="/login"
+          element={<Login onAuthenticated={handleAuthenticated} />}
+        />
+        <Route
+          path="/register"
+          element={<Register onAuthenticated={handleAuthenticated} />}
+        />
         <Route path="/accept-invite/:token" element={<AcceptInvite />} />
-
-        {/* =========================
-            COMPLETE PROFILE
-        ========================= */}
+        <Route path="/unauthorized" element={<Unauthorized />} />
 
         <Route
           path="/complete-profile"
@@ -69,56 +66,49 @@ function App() {
               authStatus={authStatus}
               redirectIfComplete
             >
-              <CompleteProfile onProfileComplete={setUser} />
+              <CompleteProfile onProfileComplete={handleAuthenticated} />
             </ProtectedRoute>
           }
         />
 
-        {/* =========================
-            LANDLORD DASHBOARD
-        ========================= */}
-
         <Route
-          path="/dashboard/*"
+          path="/landlord/dashboard/*"
           element={
             <ProtectedRoute
               user={user}
               authStatus={authStatus}
               requireCompleteProfile
-              allowedRoles={["landlord"]}
+              allowedRoles={["landlord", "admin"]}
             >
               <LandlordLayout />
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/dashboard/*"
+          element={<Navigate to="/landlord/dashboard" replace />}
+        />
 
-        {/* =========================
-            RENTER DASHBOARD
-        ========================= */}
-
-        {/* You can build this later */}
-
-
-// in your Routes:
-<Route
-  path="/renter/*"
-  element={
-    <ProtectedRoute
-      user={user}
-      authStatus={authStatus}
-      requireCompleteProfile
-      allowedRoles={["renter"]}
-    >
-      <RenterLayout user={user} />
-    </ProtectedRoute>
-  }
-/>
-
-        {/* =========================
-            FALLBACK
-        ========================= */}
+        <Route
+          path="/renter/dashboard/*"
+          element={
+            <ProtectedRoute
+              user={user}
+              authStatus={authStatus}
+              requireCompleteProfile
+              allowedRoles={["renter", "admin"]}
+            >
+              <RenterLayout user={user} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/renter/*"
+          element={<Navigate to="/renter/dashboard" replace />}
+        />
 
         <Route path="*" element={<Home />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
       </Routes>
     </BrowserRouter>
   );

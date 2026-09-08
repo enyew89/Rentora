@@ -18,6 +18,10 @@ const unitSchema = new mongoose.Schema(
       enum: ["available", "occupied", "maintenance"],
       default: "available",
     },
+    renter: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
   { timestamps: true }
 );

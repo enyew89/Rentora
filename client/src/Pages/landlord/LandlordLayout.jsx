@@ -85,9 +85,9 @@ export default function LandlordLayout() {
   const activeTab = ACTIVE_TAB[route.name] ?? "dashboard";
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white flex">
+    <div className="min-h-screen bg-transparent text-white flex">
       {/* ── Ambient orb ── */}
-      <div className="pointer-events-none fixed top-[-150px] left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-blue-700/8 rounded-full blur-[120px]" />
+      <div className="pointer-events-none fixed top-[-150px] left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-white/[0.03] rounded-full blur-[120px]" />
 
       {/* ── Sidebar (desktop) ── */}
       <aside className="hidden md:flex flex-col w-56 shrink-0 border-r border-white/5 bg-white/2 backdrop-blur-sm fixed left-0 top-0 h-full z-20 p-4">
@@ -96,7 +96,7 @@ export default function LandlordLayout() {
           <span className="text-lg font-semibold tracking-tight text-white">
             Rentora
           </span>
-          <span className="text-blue-400 text-lg">.</span>
+          <span className="text-neutral-400 text-lg">.</span>
         </div>
 
         {/* Nav */}
@@ -129,7 +129,7 @@ export default function LandlordLayout() {
       {/* ── Mobile top bar ── */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3 border-b border-white/5 bg-[#0a0a0f]/90 backdrop-blur-md">
         <span className="text-base font-semibold text-white">
-          Rentora<span className="text-blue-400">.</span>
+          Rentora<span className="text-neutral-400">.</span>
         </span>
         <button
           onClick={() => setMobileOpen(!mobileOpen)}

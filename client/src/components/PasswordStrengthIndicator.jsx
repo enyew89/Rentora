@@ -6,9 +6,9 @@ function calculatePasswordStrength(password) {
   if (/[0-9]/.test(password)) strength++;
   if (/[^A-Za-z0-9]/.test(password)) strength++;
 
-  if (strength <= 2) return { level: 'Weak', color: 'bg-red-500', width: '33%' };
+  if (strength <= 2) return { level: 'Weak', color: 'bg-neutral-400', width: '33%' };
   if (strength <= 3) return { level: 'Medium', color: 'bg-yellow-500', width: '66%' };
-  return { level: 'Strong', color: 'bg-green-500', width: '100%' };
+  return { level: 'Strong', color: 'bg-neutral-300', width: '100%' };
 }
 
 export default function PasswordStrengthIndicator({ password }) {

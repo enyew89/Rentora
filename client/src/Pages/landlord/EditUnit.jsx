@@ -183,7 +183,7 @@ export default function EditUnit({ navigate, params }) {
       />
 
       {error && (
-        <div className="mb-4 p-3 rounded-lg border border-red-500/20 bg-red-500/10 text-sm text-red-400">
+        <div className="mb-4 p-3 rounded-lg border border-neutral-500/20 bg-neutral-500/10 text-sm text-neutral-400">
           {error}
         </div>
       )}
