@@ -4,9 +4,9 @@ import { GlassCard } from "../../components/ui";
 function StatCard({ label, value, sub }) {
   return (
     <GlassCard className="p-4">
-      <p className="text-xs text-white/40 mb-1">{label}</p>
-      <p className="text-xl font-semibold text-white">{value}</p>
-      {sub && <p className="text-xs text-white/30 mt-0.5">{sub}</p>}
+      <p className="text-sm text-white/50 mb-1">{label}</p>
+      <p className="text-2xl font-semibold text-blue-400">{value}</p>
+      {sub && <p className="text-sm text-white/50 mt-0.5">{sub}</p>}
     </GlassCard>
   );
 }
@@ -18,10 +18,10 @@ function greeting(firstName) {
 }
 
 const STATUS_COLORS = {
-  pending: "text-yellow-400 bg-yellow-400/10",
-  "in-progress": "text-neutral-300 bg-neutral-400/10",
-  completed: "text-neutral-300 bg-white/10",
-  open: "text-yellow-400 bg-yellow-400/10",
+  pending: "text-amber-400 bg-amber-400/10",
+  "in-progress": "text-amber-400 bg-amber-400/10",
+  completed: "text-emerald-400 bg-emerald-400/10",
+  open: "text-amber-400 bg-amber-400/10",
 };
 
 export default function RenterDashboard({ navigate, user }) {
@@ -53,7 +53,7 @@ export default function RenterDashboard({ navigate, user }) {
     fetchData();
   }, []);
 
-  if (loading) return <div className="text-sm text-white/40">Loading...</div>;
+  if (loading) return <div className="text-base text-white/60">Loading...</div>;
 
   const unit = lease?.unit;
   const property = unit?.property;
@@ -72,7 +72,7 @@ export default function RenterDashboard({ navigate, user }) {
         <h1 className="text-2xl font-semibold text-white">
           {greeting(user?.firstName ?? "there")}
         </h1>
-        <p className="text-sm text-white/40 mt-0.5">Here's what's going on with your rental.</p>
+        <p className="text-base text-white/60 mt-0.5">Here's what's going on with your rental.</p>
       </div>
 
       {error && (
@@ -87,16 +87,16 @@ export default function RenterDashboard({ navigate, user }) {
           className="p-4 cursor-pointer hover:bg-white/6 transition-colors"
           onClick={() => navigate("my-home")}
         >
-          <p className="text-xs text-white/40 mb-2">My Home</p>
+          <p className="text-sm text-white/50 mb-2">My Home</p>
           <p className="text-base font-medium text-white">
             {property?.name ?? "—"} · Unit {unit?.unitNumber ?? "—"}
           </p>
-          <p className="text-sm text-white/40 mt-0.5">{property?.address ?? "—"}</p>
-          <p className="text-xs text-neutral-300 mt-3">View details →</p>
+          <p className="text-base text-white/60 mt-0.5">{property?.address ?? "—"}</p>
+          <p className="text-sm text-neutral-200 mt-3">View details →</p>
         </GlassCard>
       ) : (
         <GlassCard className="p-5 text-center">
-          <p className="text-sm text-white/40">No active lease found.</p>
+          <p className="text-base text-white/60">No active lease found.</p>
         </GlassCard>
       )}
 
@@ -118,10 +118,10 @@ export default function RenterDashboard({ navigate, user }) {
       {/* Maintenance summary */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-medium text-white/60">Recent Maintenance</p>
+          <p className="text-base font-semibold text-white">Recent Maintenance</p>
           <button
             onClick={() => navigate("maintenance")}
-            className="text-xs text-white/30 hover:text-white/60 transition-colors"
+            className="text-sm text-white/50 hover:text-white/60 transition-colors"
           >
             View all →
           </button>
@@ -129,10 +129,10 @@ export default function RenterDashboard({ navigate, user }) {
 
         {maintenance.length === 0 ? (
           <GlassCard className="p-5 text-center">
-            <p className="text-sm text-white/30">No maintenance requests yet.</p>
+            <p className="text-base text-white/50">No maintenance requests yet.</p>
             <button
               onClick={() => navigate("new-maintenance")}
-              className="text-xs text-white/50 hover:text-white mt-2 transition-colors"
+              className="text-sm text-white/60 hover:text-white mt-2 transition-colors"
             >
               + Submit a request
             </button>
@@ -146,8 +146,8 @@ export default function RenterDashboard({ navigate, user }) {
                 onClick={() => navigate("maintenance-detail", { id: req._id })}
               >
                 <div>
-                  <p className="text-sm text-white font-medium">{req.title}</p>
-                  <p className="text-xs text-white/30 mt-0.5">
+                  <p className="text-base text-white font-medium">{req.title}</p>
+                  <p className="text-sm text-white/50 mt-0.5">
                     {new Date(req.createdAt).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",

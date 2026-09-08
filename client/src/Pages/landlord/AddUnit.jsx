@@ -126,7 +126,7 @@ export default function AddUnit({ navigate, params }) {
 
   if (loadingProperty) {
     return (
-      <div className="text-sm text-white/40">
+      <div className="text-base text-white/60">
         Loading property...
       </div>
     );

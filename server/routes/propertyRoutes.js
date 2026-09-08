@@ -6,11 +6,11 @@ const {
   updateProperty,
   deleteProperty,
 } = require("../controllers/propertyControllers.js");
-const { isAuthenticated, isLandlord } = require("../middlewares/auth.js");
+const { isAuthenticated } = require("../middlewares/auth.js");
 
 const router = express.Router();
 
-router.use(isAuthenticated, isLandlord);
+router.use(isAuthenticated);
 
 router.get("/", getProperties);
 router.get("/:id", getProperty);

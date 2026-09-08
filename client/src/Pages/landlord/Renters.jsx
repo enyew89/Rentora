@@ -72,7 +72,7 @@ export default function Renters({ navigate }) {
           <p className="text-neutral-400 text-sm">Failed to load renters.</p>
           <button
             onClick={() => window.location.reload()}
-            className="text-xs text-white/40 hover:text-white mt-2 transition-colors"
+            className="text-sm text-white/50 hover:text-white mt-2 transition-colors"
           >
             Try again
           </button>
@@ -108,7 +108,7 @@ export default function Renters({ navigate }) {
                   <p className="text-sm font-medium text-white group-hover:text-neutral-300 transition-colors">
                     {renterName(r)}
                   </p>
-                  <p className="text-xs text-white/40">
+                  <p className="text-sm text-white/50">
                     {r.unit?.property?.name ?? "—"} · Unit{" "}
                     {r.unit?.unitNumber ?? "—"}
                   </p>
@@ -117,7 +117,7 @@ export default function Renters({ navigate }) {
 
               <div className="flex items-center gap-4">
                 <div className="text-right hidden sm:block">
-                  <p className="text-sm text-white/70">
+                  <p className="text-base text-white/70">
                     {(
                       r.unit?.rentAmount ??
                       r.lease?.monthlyRent ??
@@ -125,7 +125,7 @@ export default function Renters({ navigate }) {
                     ).toLocaleString()}{" "}
                     ETB
                   </p>
-                  <p className="text-xs text-white/30">per month</p>
+                  <p className="text-sm text-white/50">per month</p>
                 </div>
                 <Badge status={r.lastPayment?.status ?? "pending"} />
               </div>

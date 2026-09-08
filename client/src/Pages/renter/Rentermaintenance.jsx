@@ -6,11 +6,11 @@ const STATUS_STYLES = {
   pending: "text-yellow-400 bg-yellow-400/10",
   "in-progress": "text-neutral-300 bg-neutral-400/10",
   completed: "text-neutral-300 bg-white/10",
-  closed: "text-white/30 bg-white/5",
+  closed: "text-white/50 bg-white/5",
 };
 
 const PRIORITY_STYLES = {
-  low: "text-white/30",
+  low: "text-white/50",
   medium: "text-yellow-400",
   high: "text-neutral-400",
   urgent: "text-neutral-400",
@@ -37,7 +37,7 @@ export default function RenterMaintenance({ navigate }) {
     fetchRequests();
   }, []);
 
-  if (loading) return <div className="text-sm text-white/40">Loading...</div>;
+  if (loading) return <div className="text-base text-white/60">Loading...</div>;
 
   return (
     <div className="space-y-5 max-w-lg">
@@ -63,7 +63,7 @@ export default function RenterMaintenance({ navigate }) {
             🔧
           </div>
           <p className="text-sm font-medium text-white mb-1">No requests yet</p>
-          <p className="text-xs text-white/40 mb-4">
+          <p className="text-sm text-white/50 mb-4">
             Submit a request and your landlord will be notified.
           </p>
           <PrimaryButton onClick={() => navigate("new-maintenance")}>
@@ -80,8 +80,8 @@ export default function RenterMaintenance({ navigate }) {
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-white font-medium truncate">{req.title}</p>
-                  <p className="text-xs text-white/30 mt-0.5">
+                  <p className="text-base text-white font-medium truncate">{req.title}</p>
+                  <p className="text-sm text-white/50 mt-0.5">
                     Submitted{" "}
                     {new Date(req.createdAt).toLocaleDateString("en-US", {
                       month: "short",

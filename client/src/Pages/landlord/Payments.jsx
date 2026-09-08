@@ -92,31 +92,31 @@ export default function Payments() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-xl font-medium text-white">Payments</h1>
-        <p className="text-sm text-white/40 mt-1">All rent transactions across your properties.</p>
+        <h1 className="text-2xl font-semibold text-white">Payments</h1>
+        <p className="text-base text-white/60 mt-1">All rent transactions across your properties.</p>
       </div>
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 gap-3">
         <GlassCard className="p-4 border-white/20">
-          <p className="text-xs text-white/40 mb-2">Collected this month</p>
+          <p className="text-sm text-white/50 mb-2">Collected this month</p>
           {loading ? (
             <div className="h-6 bg-white/5 rounded w-24 animate-pulse" />
           ) : (
             <p className="text-xl font-medium text-neutral-300">
               {totalCollected.toLocaleString()}{" "}
-              <span className="text-sm font-normal text-white/30">ETB</span>
+              <span className="text-sm font-normal text-white/50">ETB</span>
             </p>
           )}
         </GlassCard>
         <GlassCard className="p-4 border-neutral-500/20">
-          <p className="text-xs text-white/40 mb-2">Pending</p>
+          <p className="text-sm text-white/50 mb-2">Pending</p>
           {loading ? (
             <div className="h-6 bg-white/5 rounded w-24 animate-pulse" />
           ) : (
             <p className="text-xl font-medium text-neutral-400">
               {totalPending.toLocaleString()}{" "}
-              <span className="text-sm font-normal text-white/30">ETB</span>
+              <span className="text-sm font-normal text-white/50">ETB</span>
             </p>
           )}
         </GlassCard>
@@ -124,14 +124,14 @@ export default function Payments() {
 
       {/* Transactions list */}
       <div>
-        <p className="text-sm font-medium text-white/60 mb-2">Transactions</p>
+        <p className="text-base font-semibold text-white/80 mb-2">Transactions</p>
 
         {error ? (
           <GlassCard className="p-6 text-center border-neutral-500/20">
             <p className="text-neutral-400 text-sm">Failed to load payments.</p>
             <button
               onClick={() => window.location.reload()}
-              className="text-xs text-white/40 hover:text-white mt-2 transition-colors"
+              className="text-sm text-white/50 hover:text-white mt-2 transition-colors"
             >
               Try again
             </button>
@@ -144,7 +144,7 @@ export default function Payments() {
           <GlassCard className="p-10 text-center">
             <p className="text-2xl mb-3">💳</p>
             <p className="text-sm font-medium text-white">No transactions yet</p>
-            <p className="text-xs text-white/40 mt-1">Rent payments will appear here.</p>
+            <p className="text-sm text-white/50 mt-1">Rent payments will appear here.</p>
           </GlassCard>
         ) : (
           <GlassCard className="divide-y divide-white/5 overflow-hidden">
@@ -154,7 +154,7 @@ export default function Payments() {
                   <Avatar initials={initials(p)} size="sm" />
                   <div>
                     <p className="text-sm font-medium text-white">{renterName(p)}</p>
-                    <p className="text-xs text-white/40">{renterUnit(p)}</p>
+                    <p className="text-sm text-white/50">{renterUnit(p)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -162,7 +162,7 @@ export default function Payments() {
                     <p className={`text-sm font-medium ${p.status === "paid" ? "text-neutral-300" : "text-neutral-400"}`}>
                       {p.status === "paid" ? "+" : ""}{p.amount.toLocaleString()} ETB
                     </p>
-                    <p className="text-xs text-white/30">{paymentLabel(p)}</p>
+                    <p className="text-sm text-white/50">{paymentLabel(p)}</p>
                   </div>
                   <Badge status={p.status} />
                 </div>

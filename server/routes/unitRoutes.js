@@ -8,14 +8,13 @@ const {
   updateUnit,
   deleteUnit,
 } = require("../controllers/unitControllers.js");
-const { isAuthenticated, isLandlord } = require("../middlewares/auth.js");
+const { isAuthenticated } = require("../middlewares/auth.js");
 
 const router = express.Router();
 
-router.use(isAuthenticated, isLandlord);
+router.use(isAuthenticated);
 
-router.get("/", getUnits);  
-// GET /units/all — all units across all landlord's properties
+router.get("/", getUnits);
 router.get("/all", async (req, res) => {
   try {
     const properties = await Property.find({ landlord: req.user._id }).select("_id");
@@ -28,7 +27,7 @@ router.get("/all", async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-});       // GET /units?property=:propertyId
+});
 router.get("/:id", getUnit);
 router.post("/", createUnit);
 router.put("/:id", updateUnit);

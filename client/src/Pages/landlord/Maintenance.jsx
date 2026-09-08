@@ -44,8 +44,8 @@ export default function Maintenance() {
     return (
       <div className="space-y-5">
         <div>
-          <h1 className="text-xl font-medium text-white">Maintenance</h1>
-          <p className="text-sm text-white/40 mt-1">Track and manage repair requests.</p>
+          <h1 className="text-2xl font-semibold text-white">Maintenance</h1>
+          <p className="text-base text-white/60 mt-1">Track and manage repair requests.</p>
         </div>
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
@@ -64,14 +64,14 @@ export default function Maintenance() {
     return (
       <div className="space-y-5">
         <div>
-          <h1 className="text-xl font-medium text-white">Maintenance</h1>
-          <p className="text-sm text-white/40 mt-1">Track and manage repair requests.</p>
+          <h1 className="text-2xl font-semibold text-white">Maintenance</h1>
+          <p className="text-base text-white/60 mt-1">Track and manage repair requests.</p>
         </div>
         <GlassCard className="p-6 text-center border-neutral-500/20">
           <p className="text-neutral-400 text-sm">Failed to load maintenance requests.</p>
           <button
             onClick={() => window.location.reload()}
-            className="text-xs text-white/40 hover:text-white mt-2 transition-colors"
+            className="text-sm text-white/50 hover:text-white mt-2 transition-colors"
           >
             Try again
           </button>
@@ -84,35 +84,35 @@ export default function Maintenance() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-xl font-medium text-white">Maintenance</h1>
-        <p className="text-sm text-white/40 mt-1">Track and manage repair requests.</p>
+        <h1 className="text-2xl font-semibold text-white">Maintenance</h1>
+        <p className="text-base text-white/60 mt-1">Track and manage repair requests.</p>
       </div>
 
       {/* Status summary */}
       <div className="grid grid-cols-3 gap-3">
         <GlassCard className="p-4 text-center border-neutral-500/20">
           <p className="text-2xl font-medium text-neutral-400">{counts["Open"]}</p>
-          <p className="text-xs text-white/40 mt-1">Open</p>
+          <p className="text-sm text-white/50 mt-1">Open</p>
         </GlassCard>
         <GlassCard className="p-4 text-center border-neutral-500/20">
           <p className="text-2xl font-medium text-neutral-400">{counts["In progress"]}</p>
-          <p className="text-xs text-white/40 mt-1">In progress</p>
+          <p className="text-sm text-white/50 mt-1">In progress</p>
         </GlassCard>
         <GlassCard className="p-4 text-center border-white/20">
           <p className="text-2xl font-medium text-neutral-300">{counts["Done"]}</p>
-          <p className="text-xs text-white/40 mt-1">Done</p>
+          <p className="text-sm text-white/50 mt-1">Done</p>
         </GlassCard>
       </div>
 
       {/* Requests list */}
       <div>
-        <p className="text-sm font-medium text-white/60 mb-2">All requests</p>
+        <p className="text-base font-semibold text-white/80 mb-2">All requests</p>
 
         {requests.length === 0 ? (
           <GlassCard className="p-10 text-center">
             <p className="text-2xl mb-3">🔧</p>
             <p className="text-sm font-medium text-white">No requests yet</p>
-            <p className="text-xs text-white/40 mt-1">Maintenance requests from your renters will appear here.</p>
+            <p className="text-sm text-white/50 mt-1">Maintenance requests from your renters will appear here.</p>
           </GlassCard>
         ) : (
           <GlassCard className="divide-y divide-white/5 overflow-hidden">
@@ -128,7 +128,7 @@ export default function Maintenance() {
                   <div>
                     <p className="text-sm font-medium text-white">{m.title}</p>
                     {/* Supports either a nested unit object or a plain string */}
-                    <p className="text-xs text-white/40">
+                    <p className="text-sm text-white/50">
                       {m.unit?.unitNumber
                         ? `Unit ${m.unit.unitNumber} · ${m.unit.property?.name ?? ""}`
                         : m.unit}
@@ -136,7 +136,7 @@ export default function Maintenance() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-white/30 hidden sm:block">
+                  <span className="text-sm text-white/50 hidden sm:block">
                     {new Date(m.createdAt ?? m.date).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",

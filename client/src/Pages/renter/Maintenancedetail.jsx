@@ -26,8 +26,8 @@ const PRIORITY_STYLES = {
 function Row({ label, value }) {
   return (
     <div className="flex justify-between items-center py-2.5 border-b border-white/5 last:border-0">
-      <span className="text-sm text-white/40">{label}</span>
-      <span className="text-sm text-white font-medium">{value}</span>
+      <span className="text-base text-white/60">{label}</span>
+      <span className="text-base text-white font-medium">{value}</span>
     </div>
   );
 }
@@ -61,7 +61,7 @@ export default function MaintenanceDetail({ navigate, params }) {
     fetchRequest();
   }, [id]);
 
-  if (loading) return <div className="text-sm text-white/40">Loading...</div>;
+  if (loading) return <div className="text-base text-white/60">Loading...</div>;
 
   if (error || !request) {
     return (
@@ -81,8 +81,8 @@ export default function MaintenanceDetail({ navigate, params }) {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-xl font-medium text-white">{request.title}</h1>
-          <p className="text-sm text-white/40 mt-0.5">
+          <h1 className="text-2xl font-semibold text-white">{request.title}</h1>
+          <p className="text-base text-white/60 mt-0.5">
             Submitted{" "}
             {new Date(request.createdAt).toLocaleDateString("en-US", {
               month: "long",
@@ -119,16 +119,16 @@ export default function MaintenanceDetail({ navigate, params }) {
       {/* Description */}
       {request.description && (
         <div>
-          <p className="text-sm font-medium text-white/60 mb-2">Description</p>
+          <p className="text-base font-semibold text-white/80 mb-2">Description</p>
           <GlassCard className="p-4">
-            <p className="text-sm text-white/70 leading-relaxed">{request.description}</p>
+            <p className="text-base text-white/70 leading-relaxed">{request.description}</p>
           </GlassCard>
         </div>
       )}
 
       {/* Status timeline */}
       <div>
-        <p className="text-sm font-medium text-white/60 mb-3">Progress</p>
+        <p className="text-base font-semibold text-white/80 mb-3">Progress</p>
         <GlassCard className="p-4">
           <div className="space-y-4">
             {STEPS.map((step, i) => {
@@ -142,12 +142,12 @@ export default function MaintenanceDetail({ navigate, params }) {
                         ? active
                           ? "bg-neutral-400 text-white"
                           : "bg-white text-black"
-                        : "bg-white/8 text-white/20"
+                        : "bg-white/8 text-white/40"
                     }`}
                   >
                     {done && !active ? "✓" : i + 1}
                   </div>
-                  <p className={`text-sm ${done ? "text-white" : "text-white/30"}`}>
+                  <p className={`text-sm ${done ? "text-white" : "text-white/50"}`}>
                     {STEP_LABELS[step]}
                   </p>
                 </div>
@@ -160,9 +160,9 @@ export default function MaintenanceDetail({ navigate, params }) {
       {/* Landlord notes */}
       {request.landlordNotes && (
         <div>
-          <p className="text-sm font-medium text-white/60 mb-2">Landlord Notes</p>
+          <p className="text-base font-semibold text-white/80 mb-2">Landlord Notes</p>
           <GlassCard className="p-4">
-            <p className="text-sm text-white/70 leading-relaxed">{request.landlordNotes}</p>
+            <p className="text-base text-white/70 leading-relaxed">{request.landlordNotes}</p>
           </GlassCard>
         </div>
       )}

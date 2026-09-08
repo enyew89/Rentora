@@ -4,8 +4,8 @@ import { GlassCard, PageHeader } from "../../components/ui";
 function Row({ label, value }) {
   return (
     <div className="flex justify-between items-center py-2.5 border-b border-white/5 last:border-0">
-      <span className="text-sm text-white/40">{label}</span>
-      <span className="text-sm text-white font-medium">{value}</span>
+      <span className="text-base text-white/60">{label}</span>
+      <span className="text-base text-white font-medium">{value}</span>
     </div>
   );
 }
@@ -31,7 +31,7 @@ export default function MyHome() {
     fetchLease();
   }, []);
 
-  if (loading) return <div className="text-sm text-white/40">Loading...</div>;
+  if (loading) return <div className="text-base text-white/60">Loading...</div>;
 
   if (error || !lease) {
     return (
@@ -79,7 +79,7 @@ export default function MyHome() {
 
       {/* Lease details */}
       <div>
-        <p className="text-sm font-medium text-white/60 mb-2">Lease</p>
+        <p className="text-base font-semibold text-white/80 mb-2">Lease</p>
         <GlassCard className="p-4">
           <Row label="Monthly Rent" value={`${Number(lease.monthlyRent).toLocaleString()} ETB`} />
           <Row label="Lease Start" value={leaseStart} />
@@ -97,7 +97,7 @@ export default function MyHome() {
       {/* Landlord contact */}
       {landlord && (
         <div>
-          <p className="text-sm font-medium text-white/60 mb-2">Your Landlord</p>
+          <p className="text-base font-semibold text-white/80 mb-2">Your Landlord</p>
           <GlassCard className="p-4">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-white/8 flex items-center justify-center text-sm font-semibold text-white">
@@ -107,7 +107,7 @@ export default function MyHome() {
                 <p className="text-sm font-medium text-white">
                   {[landlord.firstName, landlord.lastName].filter(Boolean).join(" ") || "Landlord"}
                 </p>
-                <p className="text-xs text-white/40">
+                <p className="text-sm text-white/50">
                   {landlord.username || landlord.email || ""}
                 </p>
               </div>

@@ -72,7 +72,7 @@ export default function Register() {
             </div>
           </div>
           <h1 className="text-2xl font-bold mb-2">Rentora</h1>
-          <p className="text-sm text-gray-500">Manage your rental business</p>
+          <p className="text-sm text-white/50">Manage your rental business</p>
         </div>
 
         {/* Premium Card */}
@@ -92,7 +92,7 @@ export default function Register() {
                 <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                   Create your account
                 </h2>
-                <p className="text-sm text-gray-500">Start managing your rental properties.</p>
+                <p className="text-sm text-white/50">Start managing your rental properties.</p>
               </div>
 
               {/* Google button */}
@@ -107,7 +107,7 @@ export default function Register() {
                   <div className="w-full border-t border-gray-700/50" />
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="px-2 bg-gray-900/60 text-xs text-gray-500 uppercase tracking-wider">Or</span>
+                  <span className="px-2 bg-gray-900/60 text-xs text-white/50 uppercase tracking-wider">Or</span>
                 </div>
               </div>
 
@@ -158,7 +158,7 @@ export default function Register() {
                       className="w-5 h-5 mt-0.5 accent-neutral-400 cursor-pointer rounded border-gray-700 bg-gray-800 transition-all hover:border-orange-500/50"
                       {...register('agreeToTerms')}
                     />
-                    <label htmlFor="terms" className="text-xs text-gray-400 cursor-pointer leading-relaxed">
+                    <label htmlFor="terms" className="text-sm text-white/60 cursor-pointer leading-relaxed">
                       I agree to the{' '}
                       <a href="#" className="text-neutral-400 hover:text-neutral-400 transition-colors font-medium">
                         Terms of Service
@@ -186,7 +186,7 @@ export default function Register() {
               </form>
 
               {/* Login link */}
-              <p className="text-center text-xs text-gray-500 pt-2">
+              <p className="text-center text-xs text-white/50 pt-2">
                 Already have an account?{' '}
                 <Link to="/login" className="text-neutral-400 hover:text-neutral-400 font-semibold transition-colors">
                   Log in
@@ -197,7 +197,7 @@ export default function Register() {
         </div>
 
         {/* Footer text */}
-        <p className="text-center text-xs text-gray-600 mt-8">
+        <p className="text-center text-xs text-white/40 mt-8">
           By continuing, you agree to our Terms and Privacy Policy
         </p>
       </div>

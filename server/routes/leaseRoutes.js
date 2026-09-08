@@ -4,16 +4,16 @@ const {
   getMyLease,
   getLease,
   updateLease,
-} =  require("../controllers/leaseControllers.js");
-const { isAuthenticated, isLandlord, isRenter } = require("../middlewares/auth.js");
+} = require("../controllers/leaseControllers.js");
+const { isAuthenticated } = require("../middlewares/auth.js");
 
 const router = express.Router();
 
 router.use(isAuthenticated);
 
-router.get("/mine", isRenter, getMyLease);
-router.get("/", isLandlord, getLeases);
-router.get("/:id", getLease);            // landlord or renter
-router.patch("/:id", isLandlord, updateLease);
+router.get("/mine", getMyLease);
+router.get("/", getLeases);
+router.get("/:id", getLease);
+router.patch("/:id", updateLease);
 
 module.exports = router;

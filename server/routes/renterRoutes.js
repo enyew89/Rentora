@@ -1,11 +1,11 @@
 const express = require("express");
 const { getRenters } = require("../controllers/renterControllers.js");
-const { isAuthenticated, isLandlord } = require("../middlewares/auth.js");
+const { isAuthenticated } = require("../middlewares/auth.js");
 
 const router = express.Router();
 
 router.use(isAuthenticated);
 
-router.get("/", isLandlord, getRenters);
+router.get("/", getRenters);
 
 module.exports = router;

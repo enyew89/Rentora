@@ -46,7 +46,7 @@ function UnitRow({ unit, onClick }) {
             Unit {unit.unitNumber}
           </p>
 
-          <p className="text-xs text-white/40 mt-0.5">
+          <p className="text-sm text-white/50 mt-0.5">
             {unit.bedrooms} bed · {unit.bathrooms} bath
             {unit.floor ? ` · Floor ${unit.floor}` : ""}
           </p>
@@ -56,12 +56,12 @@ function UnitRow({ unit, onClick }) {
       <div className="flex items-center gap-4">
         <p className="text-sm font-medium text-white/70 hidden sm:block">
           {unit.rentAmount?.toLocaleString()} ETB
-          <span className="text-white/30 font-normal">/mo</span>
+          <span className="text-white/50 font-normal">/mo</span>
         </p>
 
         <Badge status={unit.status} />
 
-        <span className="text-xs text-white/20 group-hover:text-neutral-400 transition-colors">
+        <span className="text-xs text-white/40 group-hover:text-neutral-400 transition-colors">
           →
         </span>
       </div>
@@ -178,16 +178,16 @@ export default function PropertyDetail({ navigate, params }) {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-xl font-medium text-white">
+          <h1 className="text-2xl font-semibold text-white">
             {property.name}
           </h1>
 
-          <p className="text-sm text-white/40 mt-0.5">
+          <p className="text-base text-white/60 mt-0.5">
             {property.address}
           </p>
 
           {property.description && (
-            <p className="text-sm text-white/30 mt-1 max-w-sm">
+            <p className="text-base text-white/50 mt-1 max-w-sm">
               {property.description}
             </p>
           )}
@@ -223,7 +223,7 @@ export default function PropertyDetail({ navigate, params }) {
             {units.length}
           </p>
 
-          <p className="text-xs text-white/40 mt-1">
+          <p className="text-sm text-white/50 mt-1">
             Total units
           </p>
         </GlassCard>
@@ -233,7 +233,7 @@ export default function PropertyDetail({ navigate, params }) {
             {occupied}
           </p>
 
-          <p className="text-xs text-white/40 mt-1">
+          <p className="text-sm text-white/50 mt-1">
             Occupied
           </p>
         </GlassCard>
@@ -243,7 +243,7 @@ export default function PropertyDetail({ navigate, params }) {
             {vacant}
           </p>
 
-          <p className="text-xs text-white/40 mt-1">
+          <p className="text-sm text-white/50 mt-1">
             Vacant
           </p>
         </GlassCard>
@@ -253,11 +253,11 @@ export default function PropertyDetail({ navigate, params }) {
       {units.length > 0 && (
         <GlassCard className="p-4">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-white/60">
+            <span className="text-base text-white/70">
               Occupancy
             </span>
 
-            <span className="text-sm text-white/40">
+            <span className="text-base text-white/60">
               {occupancyPct}%
             </span>
           </div>
@@ -275,7 +275,7 @@ export default function PropertyDetail({ navigate, params }) {
 
       {/* Units */}
       <div>
-        <p className="text-sm font-medium text-white/60 mb-2">
+        <p className="text-base font-semibold text-white/80 mb-2">
           Units
         </p>
 

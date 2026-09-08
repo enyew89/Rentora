@@ -6,16 +6,16 @@ const {
   createMaintenanceRequest,
   updateMaintenanceRequest,
 } = require("../controllers/maintenanceControllers.js");
-const { isAuthenticated, isLandlord, isRenter } = require("../middlewares/auth.js");
+const { isAuthenticated } = require("../middlewares/auth.js");
 
 const router = express.Router();
 
 router.use(isAuthenticated);
 
-router.get("/mine", isRenter, getMyMaintenanceRequests);
+router.get("/mine", getMyMaintenanceRequests);
 router.get("/:id", getMaintenanceRequest);
-router.get("/", isLandlord, getMaintenanceRequests);
-router.post("/", isRenter, createMaintenanceRequest);
-router.patch("/:id", isLandlord, updateMaintenanceRequest);
+router.get("/", getMaintenanceRequests);
+router.post("/", createMaintenanceRequest);
+router.patch("/:id", updateMaintenanceRequest);
 
 module.exports = router;

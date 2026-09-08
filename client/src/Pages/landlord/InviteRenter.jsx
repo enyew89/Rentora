@@ -12,8 +12,8 @@ import {
 function InfoRow({ label, value }) {
   return (
     <div className="flex justify-between items-center py-2.5 border-b border-white/5 last:border-0">
-      <span className="text-sm text-white/40">{label}</span>
-      <span className="text-sm text-white font-medium">{value}</span>
+      <span className="text-base text-white/60">{label}</span>
+      <span className="text-base text-white font-medium">{value}</span>
     </div>
   );
 }
@@ -223,7 +223,7 @@ export default function InviteRenter({ navigate, params }) {
 
   if (loading) {
     return (
-      <div className="text-sm text-white/40">
+      <div className="text-base text-white/60">
         Loading...
       </div>
     );
@@ -291,7 +291,7 @@ export default function InviteRenter({ navigate, params }) {
           />
 
           <div className="flex justify-between items-center py-2.5">
-            <span className="text-sm text-white/40">
+            <span className="text-base text-white/60">
               Status
             </span>
 
@@ -318,7 +318,7 @@ export default function InviteRenter({ navigate, params }) {
                 Invite a renter
               </p>
 
-              <p className="text-xs text-white/40 max-w-xs leading-relaxed">
+              <p className="text-sm text-white/50 max-w-xs leading-relaxed">
                 Enter the renter's email address.
                 We'll create an invitation link that
                 you can share with them.
@@ -372,7 +372,7 @@ export default function InviteRenter({ navigate, params }) {
             {/* Invited email */}
             {email && (
               <div>
-                <p className="text-xs text-white/40">
+                <p className="text-sm text-white/50">
                   Invitation sent to
                 </p>
 
@@ -384,7 +384,7 @@ export default function InviteRenter({ navigate, params }) {
 
             {/* Expiration */}
             {inviteExpiry && (
-              <p className="text-xs text-white/40">
+              <p className="text-sm text-white/50">
                 Expires{" "}
                 {inviteExpiry.toLocaleDateString(
                   "en-US",
@@ -432,7 +432,7 @@ export default function InviteRenter({ navigate, params }) {
 
             </div>
 
-            <p className="text-xs text-white/30 text-center leading-relaxed">
+            <p className="text-sm text-white/50 text-center leading-relaxed">
               This link is single-use. Once the
               renter accepts, it becomes inactive.
               Revoking it will invalidate it
