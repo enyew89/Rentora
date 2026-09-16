@@ -37,7 +37,22 @@ export default function MyHome() {
     return (
       <div className="space-y-4">
         <PageHeader title="My Home" subtitle="Your rental details" />
-        <div className="text-sm text-red-400">{error || "No active lease found."}</div>
+        {error ? (
+          <div className="text-base text-red-400">{error}</div>
+        ) : (
+          <GlassCard className="p-8 flex flex-col items-center text-center">
+            <div className="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center mb-4 text-2xl">
+              🏠
+            </div>
+            <p className="text-lg font-semibold text-white mb-2">No rental yet</p>
+            <p className="text-base text-white/50 max-w-sm leading-relaxed">
+              You don’t have an active lease. Once a landlord invites you to a unit and you accept, your rental details will appear here.
+            </p>
+            <p className="text-sm text-white/40 mt-4">
+              Check your <span className="text-blue-400 font-medium">Invitations</span> tab to see if you have any pending offers.
+            </p>
+          </GlassCard>
+        )}
       </div>
     );
   }

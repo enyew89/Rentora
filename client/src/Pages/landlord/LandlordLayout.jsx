@@ -8,7 +8,7 @@ import UnitDetail from "./UnitDetail";
 import Renters from "./Renters";
 import Payments from "./Payments";
 import Maintenance from "./Maintenance";
-import Settings from "./Settings";
+import Profile from "../../components/Profile";
 import EditUnit from "./EditUnit";
 import EditProperty from "./EditProperty";
 
@@ -18,7 +18,6 @@ const NAV = [
   { id: "renters", label: "Renters", icon: "👥" },
   { id: "payments", label: "Payments", icon: "💳" },
   { id: "maintenance", label: "Maintenance", icon: "🔧" },
-  { id: "settings", label: "Profile", icon: "👤" },
 ];
 
 function renderPage(route, navigate) {
@@ -33,7 +32,7 @@ function renderPage(route, navigate) {
     case "renters": return <Renters navigate={navigate} />;
     case "payments": return <Payments />;
     case "maintenance": return <Maintenance />;
-    case "settings": return <Settings />;
+    case "settings": return <Profile />;
     case "edit-property": return <EditProperty navigate={navigate} params={route.params} />;
     default: return <Dashboard navigate={navigate} />;
   }
@@ -94,12 +93,36 @@ export default function LandlordLayout() {
           ))}
         </nav>
 
-        <button
-          onClick={() => { window.location.href = "/dashboard"; }}
-          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white/50 hover:text-white/80 hover:bg-white/[0.06] transition-all"
-        >
-          <span className="text-base">⟳</span> Switch dashboard
-        </button>
+        
+        {/* Account actions */}
+        <div className="space-y-1 mb-2">
+          <button
+            onClick={() => navigate("settings")}
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all ${
+              activeTab === "settings"
+                ? "bg-white/8 text-white font-medium"
+                : "text-white/60 hover:text-white hover:bg-white/[0.06]"
+            }`}
+          >
+            <span className="text-base">👤</span> Profile
+          </button>
+          <button
+            onClick={() => window.location.href = "/dashboard"}
+            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white/50 hover:text-white/80 hover:bg-white/[0.06] transition-all"
+          >
+            <span className="text-base">⟳</span> Switch dashboard
+          </button>
+          <button
+            onClick={() => {
+              fetch("/api/auth/logout", { method: "POST", credentials: "include" }).then(() => {
+                window.location.href = "/login";
+              });
+            }}
+            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-red-400/80 hover:text-red-400 hover:bg-red-500/10 transition-all"
+          >
+            <span className="text-base">🚪</span> Log out
+          </button>
+        </div>
       </aside>
 
       {/* Mobile top bar */}
@@ -126,12 +149,31 @@ export default function LandlordLayout() {
                 {item.label}
               </button>
             ))}
-            <button
-              onClick={() => { window.location.href = "/dashboard"; }}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-white/50 hover:text-white/80"
-            >
-              <span className="text-lg">⟳</span> Switch dashboard
-            </button>
+            {/* Mobile account actions */}
+            <div className="space-y-1 mt-4 pt-4 border-t border-white/5">
+              <button
+                onClick={() => navigate("settings")}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-white/60 hover:text-white"
+              >
+                <span className="text-lg">👤</span> Profile
+              </button>
+              <button
+                onClick={() => window.location.href = "/dashboard"}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-white/50 hover:text-white/80"
+              >
+                <span className="text-lg">⟳</span> Switch dashboard
+              </button>
+              <button
+                onClick={() => {
+                  fetch("/api/auth/logout", { method: "POST", credentials: "include" }).then(() => {
+                    window.location.href = "/login";
+                  });
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-red-400/80 hover:text-red-400"
+              >
+                <span className="text-lg">🚪</span> Log out
+              </button>
+            </div>
           </nav>
         </div>
       )}

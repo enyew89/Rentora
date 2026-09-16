@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config({ path: require("path").join(__dirname, "..", ".env") });
 require("./middlewares/passport.js");
 const express = require("express");
 const session = require("express-session");
@@ -24,10 +24,15 @@ Connect();
 const app = express();
 
 const cors = require("cors");
+const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
 
 app.use(cors({
-  origin: "http://localhost:5173",  // your Vite frontend
-  credentials: true,                // required for sessions/cookies
+  origin: clientUrl,
+  credentials: true,
 }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -57,5 +62,16 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/invitations", invitationRoutes);
 app.use("/api/leases", leaseRoutes);
 app.use("/api/renters", renterRoutes);
+
+// ── Serve client build in production ────────────────────────────────────────
+if (process.env.NODE_ENV === "production") {
+  const path = require("path");
+  const clientDist = path.join(__dirname, "..", "client", "dist");
+  app.use(express.static(clientDist));
+  // SPA fallback — serve index.html for any non-API route
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(clientDist, "index.html"));
+  });
+}
 
 module.exports = app;

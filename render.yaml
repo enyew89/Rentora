@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: rentora
+    runtime: node
+    plan: free
+    buildCommand: cd client && npm install && npm run build
+    startCommand: cd server && node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: CLIENT_URL
+        sync: false
+      - key: MONGOOSE_CONNECTION_STRING
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_APP_PASSWORD
+        sync: false
+      - key: EMAIL_USER
+        sync: false
+      - key: CHAPA_PUBLIC_KEY
+        sync: false
+      - key: CHAPA_SECRET_KEY
+        sync: false
+      - key: BASE_URL
+        sync: false

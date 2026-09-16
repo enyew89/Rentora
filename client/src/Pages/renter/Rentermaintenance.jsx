@@ -16,7 +16,7 @@ const PRIORITY_STYLES = {
   urgent: "text-neutral-400",
 };
 
-export default function RenterMaintenance({ navigate }) {
+export default function RenterMaintenance({ navigate, user }) {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -37,6 +37,8 @@ export default function RenterMaintenance({ navigate }) {
     fetchRequests();
   }, []);
 
+  const hasLease = user?.hasLeases;
+
   if (loading) return <div className="text-base text-white/60">Loading...</div>;
 
   return (
@@ -46,10 +48,24 @@ export default function RenterMaintenance({ navigate }) {
           title="Maintenance"
           subtitle="Track and submit maintenance requests."
         />
-        <PrimaryButton onClick={() => navigate("new-maintenance")} className="shrink-0">
-          + New
-        </PrimaryButton>
+        {hasLease && (
+          <PrimaryButton onClick={() => navigate("new-maintenance")} className="shrink-0">
+            + New
+          </PrimaryButton>
+        )}
       </div>
+
+      {!hasLease && (
+        <GlassCard className="p-6 flex flex-col items-center text-center">
+          <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-3 text-xl">
+            🔒
+          </div>
+          <p className="text-base font-medium text-white mb-1">No active lease</p>
+          <p className="text-base text-white/50">
+            You need an active rental to submit maintenance requests. Accept an invitation to get started.
+          </p>
+        </GlassCard>
+      )}
 
       {error && (
         <div className="p-3 rounded-lg border border-neutral-500/20 bg-neutral-500/10 text-sm text-neutral-400">
@@ -81,6 +97,11 @@ export default function RenterMaintenance({ navigate }) {
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <p className="text-base text-white font-medium truncate">{req.title}</p>
+                  {req.unit && (
+                    <p className="text-sm text-white/40 mt-0.5">
+                      {req.unit.property?.name ? `${req.unit.property.name} — ` : ""}Unit {req.unit.unitNumber ?? "?"}
+                    </p>
+                  )}
                   <p className="text-sm text-white/50 mt-0.5">
                     Submitted{" "}
                     {new Date(req.createdAt).toLocaleDateString("en-US", {
