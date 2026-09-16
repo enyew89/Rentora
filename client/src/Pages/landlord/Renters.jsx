@@ -38,7 +38,7 @@ export default function Renters({ navigate }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+  const BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
   useEffect(() => {
     async function fetchRenters() {

@@ -5,13 +5,15 @@ import {
   Input,
   PrimaryButton,
   GhostButton,
-} from "../../components/ui";
+} from "./ui";
 
-export default function Settings() {
+export default function Profile({ user: userProp }) {
   const [hasPassword, setHasPassword] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(userProp ?? null);
+
   const [form, setForm] = useState({ firstName: "", lastName: "", phoneNumber: "" });
   const [pwForm, setPwForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
+
   const [editing, setEditing] = useState(false);
   const [changingPw, setChangingPw] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -21,7 +23,18 @@ export default function Settings() {
   const [error, setError] = useState("");
   const [pwError, setPwError] = useState("");
 
+  // Fetch user data if not provided as prop
   useEffect(() => {
+    if (userProp) {
+      setUser(userProp);
+      setForm({
+        firstName: userProp.firstName ?? "",
+        lastName: userProp.lastName ?? "",
+        phoneNumber: userProp.phoneNumber ?? "",
+      });
+      return;
+    }
+
     fetch("/api/auth/me", { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
@@ -34,7 +47,18 @@ export default function Settings() {
         });
       })
       .catch(console.error);
-  }, []);
+  }, [userProp]);
+
+  // Re-sync form when user prop changes (e.g. after save)
+  useEffect(() => {
+    if (user) {
+      setForm({
+        firstName: user.firstName ?? "",
+        lastName: user.lastName ?? "",
+        phoneNumber: user.phoneNumber ?? "",
+      });
+    }
+  }, [user]);
 
   function setField(field) {
     return (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
@@ -62,6 +86,7 @@ export default function Settings() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to update profile.");
+      setUser((prev) => ({ ...prev, ...data.user }));
       setMsg("Profile updated.");
       setEditing(false);
     } catch (err) {
@@ -110,22 +135,32 @@ export default function Settings() {
     }
   }
 
-  const email = user?.email || "\u2014";
+  const email = user?.username || user?.email || "\u2014";
 
   return (
     <div className="space-y-6 max-w-lg">
       <PageHeader title="Profile" subtitle="Manage your account details." />
 
+      {/* ── Profile info ─────────────────────────────────────────── */}
       <div>
         <div className="flex items-center justify-between mb-2">
           <p className="text-base font-semibold text-white">My Profile</p>
           {!editing && (
-            <button onClick={() => { setEditing(true); setMsg(""); setError(""); }}
-              className="text-sm text-blue-400 hover:text-blue-300 transition-colors">Edit</button>
+            <button
+              onClick={() => { setEditing(true); setMsg(""); setError(""); }}
+              className="text-sm font-medium text-blue-400 hover:text-blue-300 bg-blue-500/10 hover:bg-blue-500/15 px-3 py-1.5 rounded-lg transition-all"
+            >
+              Edit
+            </button>
           )}
         </div>
-        {msg && <div className="mb-3 p-3 rounded-lg border border-emerald-500/25 bg-emerald-500/10 text-base text-emerald-400">{msg}</div>}
-        {error && <div className="mb-3 p-3 rounded-lg border border-red-500/25 bg-red-500/10 text-base text-red-400">{error}</div>}
+
+        {msg && (
+          <div className="mb-3 p-3 rounded-lg border border-emerald-500/25 bg-emerald-500/10 text-base text-emerald-400">{msg}</div>
+        )}
+        {error && (
+          <div className="mb-3 p-3 rounded-lg border border-red-500/25 bg-red-500/10 text-base text-red-400">{error}</div>
+        )}
 
         <GlassCard className="p-5">
           {editing ? (
@@ -141,12 +176,19 @@ export default function Settings() {
               </div>
               <div className="flex gap-3 pt-1">
                 <GhostButton type="button" onClick={() => setEditing(false)}>Cancel</GhostButton>
-                <PrimaryButton type="submit" className="flex-1" disabled={saving}>{saving ? "Saving..." : "Save changes"}</PrimaryButton>
+                <PrimaryButton type="submit" className="flex-1" disabled={saving}>
+                  {saving ? "Saving..." : "Save changes"}
+                </PrimaryButton>
               </div>
             </form>
           ) : (
             <div>
-              {[["First name", form.firstName || "\u2014"], ["Last name", form.lastName || "\u2014"], ["Email", email], ["Phone", form.phoneNumber || "\u2014"]].map(([label, value]) => (
+              {[
+                ["First name", form.firstName || "\u2014"],
+                ["Last name", form.lastName || "\u2014"],
+                ["Email", email],
+                ["Phone", form.phoneNumber || "\u2014"],
+              ].map(([label, value]) => (
                 <div key={label} className="flex justify-between items-center py-2.5 border-b border-white/5 last:border-0">
                   <span className="text-base text-white/50">{label}</span>
                   <span className="text-base text-white font-medium">{value}</span>
@@ -157,39 +199,52 @@ export default function Settings() {
         </GlassCard>
       </div>
 
+      {/* ── Security ─────────────────────────────────────────────── */}
       <div>
         <div className="flex items-center justify-between mb-2">
           <p className="text-base font-semibold text-white">Security</p>
           {!changingPw && (
-            <button onClick={() => { setChangingPw(true); setPwMsg(""); setPwError(""); }}
-              className="text-sm text-blue-400 hover:text-blue-300 transition-colors">
+            <button
+              onClick={() => { setChangingPw(true); setPwMsg(""); setPwError(""); }}
+              className="text-sm font-medium text-blue-400 hover:text-blue-300 bg-blue-500/10 hover:bg-blue-500/15 px-3 py-1.5 rounded-lg transition-all"
+            >
               {hasPassword ? "Change password" : "Set password"}
             </button>
           )}
         </div>
-        {pwMsg && <div className="mb-3 p-3 rounded-lg border border-emerald-500/25 bg-emerald-500/10 text-base text-emerald-400">{pwMsg}</div>}
-        {pwError && <div className="mb-3 p-3 rounded-lg border border-red-500/25 bg-red-500/10 text-base text-red-400">{pwError}</div>}
+
+        {pwMsg && (
+          <div className="mb-3 p-3 rounded-lg border border-emerald-500/25 bg-emerald-500/10 text-base text-emerald-400">{pwMsg}</div>
+        )}
+        {pwError && (
+          <div className="mb-3 p-3 rounded-lg border border-red-500/25 bg-red-500/10 text-base text-red-400">{pwError}</div>
+        )}
 
         <GlassCard className="p-5">
           {changingPw ? (
             <form onSubmit={handleChangePassword} className="space-y-4">
-              {hasPassword && <Input label="Current password" id="currentPassword" type="password" value={pwForm.currentPassword} onChange={setPwField("currentPassword")} />}
+              {hasPassword && (
+                <Input label="Current password" id="currentPassword" type="password" value={pwForm.currentPassword} onChange={setPwField("currentPassword")} />
+              )}
               <Input label="New password" id="newPassword" type="password" placeholder="At least 8 characters" value={pwForm.newPassword} onChange={setPwField("newPassword")} />
               <Input label="Confirm new password" id="confirmPassword" type="password" value={pwForm.confirmPassword} onChange={setPwField("confirmPassword")} />
               <div className="flex gap-3 pt-1">
                 <GhostButton type="button" onClick={() => setChangingPw(false)}>Cancel</GhostButton>
-                <PrimaryButton type="submit" className="flex-1" disabled={savingPw}>{savingPw ? "Saving..." : hasPassword ? "Update password" : "Set password"}</PrimaryButton>
+                <PrimaryButton type="submit" className="flex-1" disabled={savingPw}>
+                  {savingPw ? "Saving..." : hasPassword ? "Update password" : "Set password"}
+                </PrimaryButton>
               </div>
             </form>
           ) : (
             <div className="flex justify-between items-center">
               <span className="text-base text-white/50">Password</span>
-              <span className="text-base text-white/50 tracking-widest">\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022</span>
+              <span className="text-base text-white/50 tracking-widest">{"\u2022".repeat(8)}</span>
             </div>
           )}
         </GlassCard>
       </div>
 
+      {/* ── Logout ───────────────────────────────────────────────── */}
       <div>
         <GlassCard className="p-5" accent="red">
           <div className="flex items-center justify-between">
@@ -197,7 +252,12 @@ export default function Settings() {
               <p className="text-base font-semibold text-white">Log out</p>
               <p className="text-sm text-white/50 mt-1">Sign out of your Rentora account.</p>
             </div>
-            <PrimaryButton onClick={handleLogout} className="bg-red-500/90 hover:bg-red-500 text-white">Log out</PrimaryButton>
+            <button
+              onClick={handleLogout}
+              className="bg-red-500/90 hover:bg-red-500 text-white text-base font-bold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all"
+            >
+              Log out
+            </button>
           </div>
         </GlassCard>
       </div>

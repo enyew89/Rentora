@@ -5,7 +5,7 @@ import RenterPayments from "./RenterPayments";
 import RenterMaintenance from "./RenterMaintenance";
 import NewMaintenanceRequest from "./NewMaintenanceRequest";
 import MaintenanceDetail from "./MaintenanceDetail";
-import RenterProfile from "./RenterProfile";
+import Profile from "../../components/Profile";
 import RenterInvitations from "./RenterInvitations";
 import PaymentSuccess from "./PaymentSuccess";
 
@@ -15,7 +15,6 @@ const NAV = [
   { id: "payments", label: "Payments", icon: "💳" },
   { id: "invitations", label: "Invitations", icon: "📬" },
   { id: "maintenance", label: "Maintenance", icon: "🔧" },
-  { id: "profile", label: "Profile", icon: "👤" },
 ];
 
 const ACTIVE_TAB = {
@@ -43,13 +42,13 @@ function renderPage(route, navigate, user) {
     case "payment-success":
       return <PaymentSuccess navigate={navigate} />;
     case "maintenance":
-      return <RenterMaintenance navigate={navigate} />;
+      return <RenterMaintenance navigate={navigate} user={user} />;
     case "new-maintenance":
       return <NewMaintenanceRequest navigate={navigate} />;
     case "maintenance-detail":
       return <MaintenanceDetail navigate={navigate} params={route.params} />;
     case "profile":
-      return <RenterProfile navigate={navigate} user={user} />;
+      return <Profile user={user} />;
     default:
       return <RenterDashboard navigate={navigate} user={user} />;
   }
@@ -96,24 +95,36 @@ export default function RenterLayout({ user }) {
           ))}
         </nav>
 
-        {/* Dashboard switcher */}
-        <button
-          onClick={() => window.location.href = "/dashboard"}
-          className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-base text-white/50 hover:text-white/60 hover:bg-white/5 transition-all"
-        >
-          <span className="text-base">⟳</span> Switch dashboard
-        </button>
-
-        <button
-          onClick={() => {
-            fetch("/api/auth/logout", { method: "POST", credentials: "include" }).then(() => {
-              window.location.href = "/login";
-            });
-          }}
-          className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-base text-white/50 hover:text-white/60 hover:bg-white/5 transition-all"
-        >
-          <span className="text-base">🚪</span> Logout
-        </button>
+        
+        {/* Account actions */}
+        <div className="space-y-1 mb-2">
+          <button
+            onClick={() => navigate("profile")}
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all ${
+              activeTab === "profile"
+                ? "bg-white/8 text-white font-medium"
+                : "text-white/60 hover:text-white hover:bg-white/[0.06]"
+            }`}
+          >
+            <span className="text-base">👤</span> Profile
+          </button>
+          <button
+            onClick={() => window.location.href = "/dashboard"}
+            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white/50 hover:text-white/80 hover:bg-white/[0.06] transition-all"
+          >
+            <span className="text-base">⟳</span> Switch dashboard
+          </button>
+          <button
+            onClick={() => {
+              fetch("/api/auth/logout", { method: "POST", credentials: "include" }).then(() => {
+                window.location.href = "/login";
+              });
+            }}
+            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-red-400/80 hover:text-red-400 hover:bg-red-500/10 transition-all"
+          >
+            <span className="text-base">🚪</span> Log out
+          </button>
+        </div>
       </aside>
 
       {/* Mobile top bar */}
@@ -142,6 +153,31 @@ export default function RenterLayout({ user }) {
                 {item.label}
               </button>
             ))}
+            {/* Mobile account actions */}
+            <div className="space-y-1 mt-4 pt-4 border-t border-white/5">
+              <button
+                onClick={() => navigate("profile")}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-white/60 hover:text-white"
+              >
+                <span className="text-lg">👤</span> Profile
+              </button>
+              <button
+                onClick={() => window.location.href = "/dashboard"}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-white/50 hover:text-white/80"
+              >
+                <span className="text-lg">⟳</span> Switch dashboard
+              </button>
+              <button
+                onClick={() => {
+                  fetch("/api/auth/logout", { method: "POST", credentials: "include" }).then(() => {
+                    window.location.href = "/login";
+                  });
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-red-400/80 hover:text-red-400"
+              >
+                <span className="text-lg">🚪</span> Log out
+              </button>
+            </div>
           </nav>
         </div>
       )}

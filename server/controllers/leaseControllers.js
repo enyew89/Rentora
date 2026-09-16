@@ -22,7 +22,7 @@ exports.getLeases = async (req, res) => {
   }
 };
 
-// GET /leases/mine - renter sees their active lease
+// GET /leases/mine - renter sees their most recent active lease
 exports.getMyLease = async (req, res) => {
   try {
     const lease = await Lease.findOne({
@@ -46,6 +46,31 @@ exports.getMyLease = async (req, res) => {
     }
 
     return res.json({ lease });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// GET /leases/mine/active - renter sees ALL their active leases
+exports.getMyActiveLeases = async (req, res) => {
+  try {
+    const leases = await Lease.find({
+      renter: req.user._id,
+      status: "active",
+    })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "unit",
+        populate: {
+          path: "property",
+          populate: {
+            path: "landlord",
+            select: "firstName lastName username phoneNumber",
+          },
+        },
+      });
+
+    return res.json({ leases });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

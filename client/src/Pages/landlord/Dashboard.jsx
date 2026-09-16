@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { StatCard, GlassCard, Badge, Avatar } from "../../components/ui";
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+const BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
 async function apiFetch(endpoint) {
   const res = await fetch(`${BASE_URL}${endpoint}`, {
