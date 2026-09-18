@@ -16,6 +16,7 @@ const paymentRoutes = require("./routes/paymentRoutes.js");
 const invitationRoutes = require("./routes/invitationRoutes.js");
 const leaseRoutes = require("./routes/leaseRoutes.js");
 const renterRoutes = require("./routes/renterRoutes.js");
+const contactRoutes = require("./routes/contactRoutes.js");
 
 const dns = require("node:dns");
 // dns.setDefaultResultOrder("ipv4first");
@@ -74,6 +75,7 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/invitations", invitationRoutes);
 app.use("/api/leases", leaseRoutes);
 app.use("/api/renters", renterRoutes);
+app.use("/api/contact", contactRoutes);
 
 // ── Serve client build in production ────────────────────────────────────────
 if (process.env.NODE_ENV === "production") {

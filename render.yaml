@@ -28,3 +28,5 @@ services:
         sync: false
       - key: BASE_URL
         sync: false
+      - key: CONTACT_EMAIL
+        sync: false

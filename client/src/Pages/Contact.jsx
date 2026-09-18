@@ -17,16 +17,33 @@ const footerLinks = {
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     setIsSubmitting(true);
-    
-    // Simulate a network request
-    setTimeout(() => {
-      setIsSubmitting(false);
+
+    const form = e.target;
+    const name = form.name.value;
+    const email = form.email.value;
+    const message = form.message.value;
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, message }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to send message.");
       setSubmitted(true);
-    }, 1200);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -92,19 +109,24 @@ export default function Contact() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
+              {error && (
+                <div className="p-3 rounded-lg border border-red-500/30 bg-red-500/10 text-sm text-red-400">
+                  {error}
+                </div>
+              )}
               <div className="grid sm:grid-cols-2 gap-5">
                 <div className="flex flex-col gap-2">
                   <label htmlFor="name" className="text-sm font-medium text-neutral-300 ml-1">Name</label>
-                  <input id="name" type="text" required placeholder="John Doe" className="w-full px-4 py-3.5 text-sm text-white bg-white/[0.08] border border-white/20 rounded-xl placeholder:text-neutral-400 focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all" />
+                  <input id="name" name="name" type="text" required placeholder="John Doe" className="w-full px-4 py-3.5 text-sm text-white bg-white/[0.08] border border-white/20 rounded-xl placeholder:text-neutral-400 focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all" />
                 </div>
                 <div className="flex flex-col gap-2">
                   <label htmlFor="email" className="text-sm font-medium text-neutral-300 ml-1">Email</label>
-                  <input id="email" type="email" required placeholder="john@example.com" className="w-full px-4 py-3.5 text-sm text-white bg-white/[0.08] border border-white/20 rounded-xl placeholder:text-neutral-400 focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all" />
+                  <input id="email" name="email" type="email" required placeholder="john@example.com" className="w-full px-4 py-3.5 text-sm text-white bg-white/[0.08] border border-white/20 rounded-xl placeholder:text-neutral-400 focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all" />
                 </div>
               </div>
               <div className="flex flex-col gap-2">
                 <label htmlFor="message" className="text-sm font-medium text-neutral-300 ml-1">Message</label>
-                <textarea id="message" rows={5} required placeholder="How can we help you?" className="w-full px-4 py-3.5 text-sm text-white bg-white/[0.08] border border-white/20 rounded-xl placeholder:text-neutral-400 focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all resize-none" />
+                <textarea id="message" name="message" rows={5} required placeholder="How can we help you?" className="w-full px-4 py-3.5 text-sm text-white bg-white/[0.08] border border-white/20 rounded-xl placeholder:text-neutral-400 focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/40 transition-all resize-none" />
               </div>
               <button 
                 type="submit" 

@@ -9,20 +9,15 @@ const transporter = nodemailer.createTransport({
 });
 
 
-function sendEmail(to, subject, text) {
+function sendEmail(to, subject, text, html) {
   const mailOptions = {
     from: process.env.EMAIL_USER,
-    to: to,
-    subject: subject,
-    text: text
+    to,
+    subject,
+    text,
+    ...(html ? { html } : {}),
   };
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error('Error sending email:', error);
-    } else {
-      console.log('Email sent:', info.response);
-    }
-  });
+  return transporter.sendMail(mailOptions);
 }
 
 module.exports = sendEmail;
