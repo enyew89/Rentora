@@ -2,18 +2,18 @@ import { useEffect, useState } from "react";
 import { GlassCard, PageHeader, PrimaryButton } from "../../components/ui";
 
 const STATUS_STYLES = {
-  open: "text-yellow-400 bg-yellow-400/10",
-  pending: "text-yellow-400 bg-yellow-400/10",
-  "in-progress": "text-neutral-300 bg-neutral-400/10",
-  completed: "text-neutral-300 bg-white/10",
+  open: "text-amber-400 bg-amber-400/15",
+  pending: "text-amber-400 bg-amber-400/15",
+  "in-progress": "text-blue-400 bg-blue-400/15",
+  completed: "text-emerald-400 bg-emerald-400/15",
   closed: "text-white/50 bg-white/5",
 };
 
 const PRIORITY_STYLES = {
   low: "text-white/50",
-  medium: "text-yellow-400",
-  high: "text-neutral-400",
-  urgent: "text-neutral-400",
+  medium: "text-amber-400",
+  high: "text-orange-400",
+  urgent: "text-red-400",
 };
 
 export default function RenterMaintenance({ navigate, user }) {

@@ -2,6 +2,7 @@ require("dotenv").config({ path: require("path").join(__dirname, "..", ".env") }
 require("./middlewares/passport.js");
 const express = require("express");
 const session = require("express-session");
+const { MongoStore } = require("connect-mongo");
 const Connect = require("./config/db.js");
 const passport = require("passport");
 const bodyParser = require("body-parser");
@@ -42,6 +43,10 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    store: new MongoStore({
+      mongoUrl: process.env.MONGOOSE_CONNECTION_STRING,
+      collectionName: "sessions",
+    }),
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

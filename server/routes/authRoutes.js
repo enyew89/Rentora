@@ -9,6 +9,7 @@ router.post("/api/auth/register", authControllers.register);
 router.post("/api/auth/login", authControllers.login);
 router.post("/api/auth/logout", authControllers.logout);
 router.get("/api/auth/me", authControllers.getCurrentUser);
+router.put("/api/auth/profile", isAuthenticated, authControllers.updateProfile);
 router.post("/api/auth/change-password", isAuthenticated, authControllers.changePassword);
 
 router.post(

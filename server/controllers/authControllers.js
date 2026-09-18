@@ -164,6 +164,24 @@ exports.getCurrentUser = async function (req, res) {
   }
 };
 
+exports.updateProfile = async function (req, res) {
+  const { firstName, lastName, phoneNumber } = req.body;
+
+  try {
+    if (firstName !== undefined) req.user.firstName = firstName.trim();
+    if (lastName !== undefined) req.user.lastName = lastName.trim();
+    if (phoneNumber !== undefined) req.user.phoneNumber = phoneNumber.trim();
+
+    const savedUser = await req.user.save();
+    req.user = savedUser;
+
+    return res.status(200).json({ user: formatUser(savedUser) });
+  } catch (err) {
+    console.error("UPDATE PROFILE ERROR:", err);
+    return res.status(500).json({ message: "Failed to update profile" });
+  }
+};
+
 exports.logout = function (req, res, next) {
   req.logout(function (err) {
     if (err) {

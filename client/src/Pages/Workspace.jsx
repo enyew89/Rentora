@@ -1,16 +1,38 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Building2, Home } from "lucide-react";
 
-export default function Workspace({ user }) {
+export default function Workspace() {
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const fetched = useRef(false);
 
   useEffect(() => {
-    // Brief loading state so the page doesn't flash
-    const t = setTimeout(() => setLoading(false), 300);
-    return () => clearTimeout(t);
-  }, []);
+    if (fetched.current) return;
+    fetched.current = true;
+
+    fetch("/api/auth/me", { credentials: "include" })
+      .then((res) => {
+        if (!res.ok) throw new Error("Not authenticated");
+        return res.json();
+      })
+      .then((data) => {
+        const u = data.user;
+        setUser(u);
+        setLoading(false);
+
+        // Redirect if only one role — do it here, not during render
+        if (u.hasProperties && !u.hasLeases) {
+          navigate("/landlord/dashboard", { replace: true });
+        } else if (!u.hasProperties && u.hasLeases) {
+          navigate("/renter/dashboard", { replace: true });
+        }
+      })
+      .catch(() => {
+        navigate("/login", { replace: true });
+      });
+  }, [navigate]);
 
   if (loading) {
     return (
@@ -23,17 +45,7 @@ export default function Workspace({ user }) {
   const hasProperties = user?.hasProperties;
   const hasLeases = user?.hasLeases;
 
-  // If user has only one type, go directly there
-  if (hasProperties && !hasLeases) {
-    navigate("/landlord/dashboard", { replace: true });
-    return null;
-  }
-  if (!hasProperties && hasLeases) {
-    navigate("/renter/dashboard", { replace: true });
-    return null;
-  }
-
-  // If user has both or neither, show the workspace
+  // If user has both or neither, show the workspace chooser
   return (
     <div className="min-h-screen bg-transparent text-white">
       <div className="max-w-2xl mx-auto px-4 py-16">
@@ -47,11 +59,7 @@ export default function Workspace({ user }) {
           <p className="text-base text-white/60 mt-1">
             {hasProperties && hasLeases
               ? "You have both landlord and renter access. Choose where to go."
-              : hasProperties
-                ? "You own properties. Start managing them."
-                : hasLeases
-                  ? "You have an active rental. View your home."
-                  : "Welcome to Rentora. Add a property or accept an invitation to get started."}
+              : "Welcome to Rentora. Add a property or accept an invitation to get started."}
           </p>
         </div>
 
