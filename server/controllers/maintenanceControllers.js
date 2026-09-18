@@ -8,15 +8,16 @@ const Lease = require("../models/Lease.js");
 // GET /maintenance — landlord sees all requests across their properties
 exports.getMaintenanceRequests = async (req, res) => {
   try {
-    const properties = await Property.find({ landlord: req.user._id }).select("_id");
+    const properties = await Property.find({ landlord: req.user._id }).select("_id").lean();
     const propertyIds = properties.map((p) => p._id);
 
-    const units = await Unit.find({ property: { $in: propertyIds } }).select("_id");
+    const units = await Unit.find({ property: { $in: propertyIds } }).select("_id").lean();
     const unitIds = units.map((u) => u._id);
 
     const requests = await MaintenanceRequest.find({ unit: { $in: unitIds } })
       .populate("renter", "firstName lastName username phoneNumber")
-      .populate({ path: "unit", populate: { path: "property" } });
+      .populate({ path: "unit", populate: { path: "property" } })
+      .lean();
 
     res.json(requests);
   } catch (err) {
@@ -29,7 +30,8 @@ exports.getMyMaintenanceRequests = async (req, res) => {
     const limit = Number(req.query.limit) || 0;
     const query = MaintenanceRequest.find({ renter: req.user._id })
       .sort({ createdAt: -1 })
-      .populate({ path: "unit", populate: { path: "property" } });
+      .populate({ path: "unit", populate: { path: "property" } })
+      .lean();
 
     if (limit > 0) {
       query.limit(limit);

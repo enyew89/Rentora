@@ -35,7 +35,7 @@ export default function RenterDashboard({ navigate, user }) {
       try {
         const [leaseRes, maintRes] = await Promise.all([
           fetch("/api/leases/mine", { credentials: "include" }),
-          fetch("/api/maintenance?limit=3", { credentials: "include" }),
+          fetch("/api/maintenance/mine?limit=3", { credentials: "include" }),
         ]);
 
         const leaseData = await leaseRes.json();

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import Home from "./Pages/Home";
@@ -6,13 +6,23 @@ import About from "./Pages/About";
 import Contact from "./Pages/Contact";
 import Login from "./Pages/Login";
 import Register from "./Pages/Register";
-import Workspace from "./Pages/Workspace";
-import LandlordLayout from "./Pages/landlord/LandlordLayout";
-import CompleteProfile from "./Pages/Completeprofile";
-import RenterLayout from "./Pages/renter/Renterlayout";
 import Unauthorized from "./Pages/Unauthorized";
 import ProtectedRoute from "./components/ProtectedRoute";
-import PaymentSuccess from "./Pages/renter/PaymentSuccess";
+
+// Lazy-load heavy dashboard bundles — only loaded when the user navigates there
+const Workspace = lazy(() => import("./Pages/Workspace"));
+const LandlordLayout = lazy(() => import("./Pages/landlord/LandlordLayout"));
+const CompleteProfile = lazy(() => import("./Pages/Completeprofile"));
+const RenterLayout = lazy(() => import("./Pages/renter/Renterlayout"));
+const PaymentSuccess = lazy(() => import("./Pages/renter/PaymentSuccess"));
+
+function DashboardSpinner() {
+  return (
+    <div className="min-h-screen bg-transparent flex items-center justify-center">
+      <p className="text-sm text-white/50">Loading...</p>
+    </div>
+  );
+}
 
 function App() {
   const [user, setUser] = useState(null);
@@ -41,6 +51,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <Suspense fallback={<DashboardSpinner />}>
       <Routes>
         {/* Public pages */}
         <Route path="/" element={<Home />} />
@@ -93,6 +104,7 @@ function App() {
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="*" element={<Home />} />
       </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

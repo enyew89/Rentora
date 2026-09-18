@@ -6,15 +6,16 @@ const Unit = require("../models/Unit.js");
 // GET /leases — landlord sees all active leases
 exports.getLeases = async (req, res) => {
   try {
-    const properties = await Property.find({ landlord: req.user._id }).select("_id");
+    const properties = await Property.find({ landlord: req.user._id }).select("_id").lean();
     const propertyIds = properties.map((p) => p._id);
 
-    const units = await Unit.find({ property: { $in: propertyIds } }).select("_id");
+    const units = await Unit.find({ property: { $in: propertyIds } }).select("_id").lean();
     const unitIds = units.map((u) => u._id);
 
     const leases = await Lease.find({ unit: { $in: unitIds } })
       .populate("renter", "firstName lastName username phoneNumber")
-      .populate({ path: "unit", populate: { path: "property" } });
+      .populate({ path: "unit", populate: { path: "property" } })
+      .lean();
 
     res.json(leases);
   } catch (err) {
@@ -39,7 +40,8 @@ exports.getMyLease = async (req, res) => {
             select: "firstName lastName username phoneNumber",
           },
         },
-      });
+      })
+      .lean();
 
     if (!lease) {
       return res.status(404).json({ message: "No active lease found." });
@@ -68,7 +70,8 @@ exports.getMyActiveLeases = async (req, res) => {
             select: "firstName lastName username phoneNumber",
           },
         },
-      });
+      })
+      .lean();
 
     return res.json({ leases });
   } catch (err) {

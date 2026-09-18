@@ -81,7 +81,8 @@ exports.getInvitations = async (req, res) => {
       .populate({
         path: "unit",
         populate: { path: "property", select: "name address" },
-      });
+      })
+      .lean();
 
     res.json(invitations);
   } catch (err) {
@@ -101,7 +102,8 @@ exports.getMyInvitations = async (req, res) => {
       .populate({
         path: "unit",
         populate: { path: "property", select: "name address city" },
-      });
+      })
+      .lean();
 
     res.json(invitations);
   } catch (err) {

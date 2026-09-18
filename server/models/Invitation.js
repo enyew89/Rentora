@@ -35,4 +35,8 @@ const invitationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+invitationSchema.index({ renter: 1, status: 1 });
+invitationSchema.index({ landlord: 1 });
+invitationSchema.index({ unit: 1, status: 1 });
+
 module.exports = mongoose.model("Invitation", invitationSchema);

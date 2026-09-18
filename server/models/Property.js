@@ -16,4 +16,6 @@ const propertySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+propertySchema.index({ landlord: 1 });
+
 module.exports = mongoose.model("Property", propertySchema);

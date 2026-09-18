@@ -32,4 +32,7 @@ const leaseSchema = new mongoose.Schema(
 
 // Traverse: lease.unit → unit.property → property.landlord
 
+leaseSchema.index({ renter: 1, status: 1 });
+leaseSchema.index({ unit: 1 });
+
 module.exports = mongoose.model("Lease", leaseSchema);

@@ -9,17 +9,13 @@ const User = require("../models/User.js");
 // ─────────────────────────────────────────────
 exports.getPayments = async (req, res) => {
   try {
-    const properties = await Property.find({ landlord: req.user._id }).select(
-      "_id",
-    );
+    const properties = await Property.find({ landlord: req.user._id }).select("_id").lean();
     const propertyIds = properties.map((p) => p._id);
 
-    const units = await Unit.find({ property: { $in: propertyIds } }).select(
-      "_id",
-    );
+    const units = await Unit.find({ property: { $in: propertyIds } }).select("_id").lean();
     const unitIds = units.map((u) => u._id);
 
-    const leases = await Lease.find({ unit: { $in: unitIds } }).select("_id");
+    const leases = await Lease.find({ unit: { $in: unitIds } }).select("_id").lean();
     const leaseIds = leases.map((l) => l._id);
 
     const payments = await Payment.find({ lease: { $in: leaseIds } })
@@ -27,7 +23,8 @@ exports.getPayments = async (req, res) => {
       .populate({
         path: "lease",
         populate: { path: "unit", populate: { path: "property" } },
-      });
+      })
+      .lean();
 
     res.json(payments);
   } catch (err) {
@@ -48,7 +45,8 @@ exports.getMyPayments = async (req, res) => {
       .populate({
         path: "lease",
         populate: { path: "unit", populate: { path: "property" } },
-      });
+      })
+      .lean();
 
     res.json({ payments });
   } catch (err) {
