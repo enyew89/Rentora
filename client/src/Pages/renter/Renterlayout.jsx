@@ -109,10 +109,10 @@ export default function RenterLayout({ user }) {
             <span className="text-base">👤</span> Profile
           </button>
           <button
-            onClick={() => window.location.href = "/dashboard"}
+            onClick={() => window.location.href = "/landlord/dashboard"}
             className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white/50 hover:text-white/80 hover:bg-white/[0.06] transition-all"
           >
-            <span className="text-base">⟳</span> Switch dashboard
+            <span className="text-base">⟳</span> Switch to Landlord
           </button>
           <button
             onClick={() => {
@@ -162,10 +162,10 @@ export default function RenterLayout({ user }) {
                 <span className="text-lg">👤</span> Profile
               </button>
               <button
-                onClick={() => window.location.href = "/dashboard"}
+                onClick={() => window.location.href = "/landlord/dashboard"}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-white/50 hover:text-white/80"
               >
-                <span className="text-lg">⟳</span> Switch dashboard
+                <span className="text-lg">⟳</span> Switch to Landlord
               </button>
               <button
                 onClick={() => {

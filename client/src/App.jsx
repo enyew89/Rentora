@@ -65,7 +65,7 @@ function App() {
           path="/dashboard"
           element={
             <ProtectedRoute user={user} authStatus={authStatus} requireCompleteProfile>
-              <Workspace user={user} />
+              <Workspace />
             </ProtectedRoute>
           }
         />

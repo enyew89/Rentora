@@ -14,6 +14,14 @@ export default function MyHome() {
   const [lease, setLease] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  function copyPhone(number) {
+    navigator.clipboard.writeText(number).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
 
   useEffect(() => {
     async function fetchLease() {
@@ -131,7 +139,9 @@ export default function MyHome() {
             <div className="flex gap-2">
               {(landlord.username || landlord.email) && (
                 <a
-                  href={`mailto:${landlord.username || landlord.email}`}
+                  href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(landlord.username || landlord.email)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex-1 text-center text-sm py-2 px-3 rounded-xl border border-white/8 text-white/60 hover:text-white hover:bg-white/5 transition-all"
                 >
                   ✉ Email
@@ -139,11 +149,22 @@ export default function MyHome() {
               )}
               {landlord.phoneNumber && (
                 <a
-                  href={`tel:${landlord.phoneNumber}`}
+                  href={`https://wa.me/${landlord.phoneNumber.replace(/[^0-9]/g, "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex-1 text-center text-sm py-2 px-3 rounded-xl border border-white/8 text-white/60 hover:text-white hover:bg-white/5 transition-all"
                 >
-                  📞 Call
+                  💬 WhatsApp
                 </a>
+              )}
+              {landlord.phoneNumber && (
+                <button
+                  onClick={() => copyPhone(landlord.phoneNumber)}
+                  className="flex-1 text-center text-sm py-2 px-3 rounded-xl border border-white/8 transition-all "
+                  style={{ color: copied ? "#4ade80" : undefined }}
+                >
+                  {copied ? "✓ Copied" : "📋 Copy"}
+                </button>
               )}
             </div>
           </GlassCard>

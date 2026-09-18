@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { GlassCard, PageHeader } from "../../components/ui";
 
-export default function PaymentSuccess() {
+export default function PaymentSuccess({ navigate }) {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
+  // Use the navigate prop from RenterLayout (internal routing), not React Router
   const [status, setStatus] = useState("checking"); // "checking" | "paid" | "pending" | "error"
 
   const tx_ref = searchParams.get("trx_ref") || searchParams.get("tx_ref");
@@ -75,7 +75,7 @@ export default function PaymentSuccess() {
           )}
 
           <button
-            onClick={() => navigate("/renter/payments")}
+            onClick={() => navigate("payments")}
             className="mt-2 w-full py-2.5 rounded-xl bg-white hover:bg-neutral-400 text-sm font-semibold text-black transition-all"
           >
             Go to My Payments
