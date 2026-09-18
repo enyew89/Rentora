@@ -7,27 +7,36 @@ const Payment = require("../models/Payment.js");
 exports.getRenters = async (req, res) => {
   try {
     // 1. Find all properties belonging to this landlord
-    const properties = await Property.find({ landlord: req.user._id }).select("_id");
+    const properties = await Property.find({ landlord: req.user._id }).select("_id").lean();
     const propertyIds = properties.map((p) => p._id);
 
     // 2. Find all units under those properties
-    const units = await Unit.find({ property: { $in: propertyIds } }).select("_id");
+    const units = await Unit.find({ property: { $in: propertyIds } }).select("_id").lean();
     const unitIds = units.map((u) => u._id);
 
     // 3. Find all active leases under those units
     const leases = await Lease.find({ unit: { $in: unitIds }, status: "active" })
       .populate("renter", "firstName lastName username phoneNumber")
-      .populate({ path: "unit", populate: { path: "property", select: "name address" } });
+      .populate({ path: "unit", populate: { path: "property", select: "name address" } })
+      .lean();
 
-    // 4. For each lease, find the most recent payment (current month or earlier)
+    // 4. Batch-fetch latest payment for ALL leases at once (no N+1)
+    const leaseIds = leases.map((l) => l._id);
     const now = new Date();
+    const latestPayments = await Payment.find({
+      lease: { $in: leaseIds },
+      dueDate: { $lte: now },
+    }).sort({ dueDate: -1 }).lean();
 
-    const renters = await Promise.all(
-      leases.map(async (lease) => {
-        const lastPayment = await Payment.findOne({
-          lease: lease._id,
-          dueDate: { $lte: now },
-        }).sort({ dueDate: -1 });
+    // Index by lease ID for O(1) lookup
+    const paymentByLease = {};
+    for (const p of latestPayments) {
+      const lid = p.lease.toString();
+      if (!paymentByLease[lid]) paymentByLease[lid] = p;
+    }
+
+    const renters = leases.map((lease) => {
+        const lastPayment = paymentByLease[lease._id.toString()] || null;
 
         return {
           _id: lease._id,
@@ -58,8 +67,7 @@ exports.getRenters = async (req, res) => {
             ? { status: lastPayment.status, dueDate: lastPayment.dueDate }
             : null,
         };
-      })
-    );
+      });
 
     res.json(renters);
   } catch (err) {

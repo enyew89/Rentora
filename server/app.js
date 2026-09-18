@@ -1,6 +1,7 @@
 require("dotenv").config({ path: require("path").join(__dirname, "..", ".env") });
 require("./middlewares/passport.js");
 const express = require("express");
+const compression = require("compression");
 const session = require("express-session");
 const { MongoStore } = require("connect-mongo");
 const Connect = require("./config/db.js");
@@ -35,6 +36,12 @@ app.use(cors({
   origin: clientUrl,
   credentials: true,
 }));
+
+// Gzip all responses (cuts transfer size ~70%)
+if (process.env.NODE_ENV === "production") {
+  app.use(compression());
+}
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -72,7 +79,11 @@ app.use("/api/renters", renterRoutes);
 if (process.env.NODE_ENV === "production") {
   const path = require("path");
   const clientDist = path.join(__dirname, "..", "client", "dist");
-  app.use(express.static(clientDist));
+  app.use(express.static(clientDist, {
+    maxAge: "1y",           // Vite hashes filenames, safe to cache long
+    etag: true,
+    lastModified: true,
+  }));
   // SPA fallback — serve index.html for any non-API route
   app.get("/{*path}", (req, res) => {
     res.sendFile(path.join(clientDist, "index.html"));

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { StatCard, GlassCard, Badge, Avatar } from "../../components/ui";
+import { StatCard, GlassCard, Avatar } from "../../components/ui";
 
 const BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
@@ -41,23 +41,20 @@ export default function Dashboard({ navigate }) {
   const [properties,  setProperties]  = useState([]);
   const [units,       setUnits]       = useState([]);
   const [payments,    setPayments]    = useState([]);
-  const [maintenance, setMaintenance] = useState([]);
   const [loading,     setLoading]     = useState(true);
   const [error,       setError]       = useState(null);
 
   useEffect(() => {
     async function fetchAll() {
       try {
-        const [props, allUnits, pays, maint] = await Promise.all([
+        const [props, allUnits, pays] = await Promise.all([
           apiFetch("/properties"),
           apiFetch("/units/all"),
           apiFetch("/payments"),
-          apiFetch("/maintenance"),
         ]);
         setProperties(props);
         setUnits(allUnits);
         setPayments(pays);
-        setMaintenance(maint);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -98,10 +95,6 @@ export default function Dashboard({ navigate }) {
   const recentPayments = visiblePayments
     .filter((p) => p.status === "paid")
     .sort((a, b) => new Date(b.paymentDate) - new Date(a.paymentDate))
-    .slice(0, 3);
-
-  const recentMaintenance = [...maintenance]
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .slice(0, 3);
 
   const hour = new Date().getHours();
@@ -214,43 +207,7 @@ export default function Dashboard({ navigate }) {
         )}
       </div>
 
-      {/* Recent Maintenance */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <p className="text-base font-semibold text-white">Recent maintenance</p>
-          <button
-            onClick={() => navigate("maintenance")}
-            className="text-sm text-neutral-300 hover:text-neutral-300 transition-colors"
-          >
-            View all →
-          </button>
-        </div>
 
-        {recentMaintenance.length === 0 ? (
-          <GlassCard className="p-6 text-center text-base text-white/50">
-            No maintenance requests yet.
-          </GlassCard>
-        ) : (
-          <GlassCard className="divide-y divide-white/5">
-            {recentMaintenance.map((m) => (
-              <div key={m._id} className="flex items-center justify-between px-4 py-3">
-                <div>
-                  <p className="text-sm font-medium text-white">{m.title}</p>
-                  <p className="text-sm text-white/50">
-                    {m.unit?.unitNumber ? `Unit ${m.unit.unitNumber}` : "—"}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-white/50">
-                    {new Date(m.createdAt).toLocaleDateString()}
-                  </span>
-                  <Badge status={m.status} />
-                </div>
-              </div>
-            ))}
-          </GlassCard>
-        )}
-      </div>
     </div>
   );
 }

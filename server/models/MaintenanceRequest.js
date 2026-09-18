@@ -32,4 +32,8 @@ const maintenanceSchema = new mongoose.Schema(
 
 // Traverse: maintenance.unit → unit.property → property.landlord
 
+maintenanceSchema.index({ unit: 1 });
+maintenanceSchema.index({ renter: 1 });
+maintenanceSchema.index({ status: 1 });
+
 module.exports = mongoose.model("MaintenanceRequest", maintenanceSchema);

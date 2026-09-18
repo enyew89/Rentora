@@ -47,4 +47,9 @@ const paymentSchema = new mongoose.Schema(
 
 // Traverse: payment.lease → lease.unit → unit.property → property.landlord
 
+paymentSchema.index({ lease: 1 });
+paymentSchema.index({ renter: 1 });
+paymentSchema.index({ status: 1 });
+paymentSchema.index({ tx_ref: 1 }, { sparse: true });
+
 module.exports = mongoose.model("Payment", paymentSchema);

@@ -27,5 +27,8 @@ const unitSchema = new mongoose.Schema(
 );
 
 unitSchema.index({ property: 1, unitNumber: 1 }, { unique: true });
+unitSchema.index({ property: 1 });
+unitSchema.index({ renter: 1 });
+unitSchema.index({ status: 1 });
 
 module.exports = mongoose.model("Unit", unitSchema);
